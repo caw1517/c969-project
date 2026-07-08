@@ -31,10 +31,20 @@
             Main_MenuStripPanel = new Panel();
             Main_MenuStrip = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
+            signOutToolStripMenuItem = new ToolStripMenuItem();
+            exitToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
+            aboutToolStripMenuItem1 = new ToolStripMenuItem();
             Main_TabControlPanel = new Panel();
             Main_TabControl = new TabControl();
             customersPage = new TabPage();
+            customersDataTable = new DataGridView();
+            customerId = new DataGridViewTextBoxColumn();
+            customerName = new DataGridViewTextBoxColumn();
+            customerAddress = new DataGridViewTextBoxColumn();
+            customerCity = new DataGridViewTextBoxColumn();
+            customerCountry = new DataGridViewTextBoxColumn();
+            bIsCustomerActive = new DataGridViewTextBoxColumn();
             customersButtonLayoutPanel = new FlowLayoutPanel();
             addCustomerButton = new Button();
             editCustomerButton = new Button();
@@ -44,14 +54,12 @@
             calendarPage = new TabPage();
             reportsPage = new TabPage();
             loginHistoryPage = new TabPage();
-            signOutToolStripMenuItem = new ToolStripMenuItem();
-            exitToolStripMenuItem = new ToolStripMenuItem();
-            aboutToolStripMenuItem1 = new ToolStripMenuItem();
             Main_MenuStripPanel.SuspendLayout();
             Main_MenuStrip.SuspendLayout();
             Main_TabControlPanel.SuspendLayout();
             Main_TabControl.SuspendLayout();
             customersPage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)customersDataTable).BeginInit();
             customersButtonLayoutPanel.SuspendLayout();
             SuspendLayout();
             // 
@@ -83,12 +91,30 @@
             fileToolStripMenuItem.Size = new Size(37, 20);
             fileToolStripMenuItem.Text = "File";
             // 
+            // signOutToolStripMenuItem
+            // 
+            signOutToolStripMenuItem.Name = "signOutToolStripMenuItem";
+            signOutToolStripMenuItem.Size = new Size(120, 22);
+            signOutToolStripMenuItem.Text = "Sign Out";
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.Size = new Size(120, 22);
+            exitToolStripMenuItem.Text = "Exit";
+            // 
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { aboutToolStripMenuItem1 });
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             aboutToolStripMenuItem.Size = new Size(52, 20);
             aboutToolStripMenuItem.Text = "About";
+            // 
+            // aboutToolStripMenuItem1
+            // 
+            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
+            aboutToolStripMenuItem1.Size = new Size(107, 22);
+            aboutToolStripMenuItem1.Text = "About";
             // 
             // Main_TabControlPanel
             // 
@@ -121,6 +147,7 @@
             // customersPage
             // 
             customersPage.BackColor = SystemColors.Control;
+            customersPage.Controls.Add(customersDataTable);
             customersPage.Controls.Add(customersButtonLayoutPanel);
             customersPage.Location = new Point(4, 34);
             customersPage.Name = "customersPage";
@@ -128,6 +155,60 @@
             customersPage.Size = new Size(1394, 775);
             customersPage.TabIndex = 0;
             customersPage.Text = "Customers";
+            // 
+            // customersDataTable
+            // 
+            customersDataTable.AllowUserToAddRows = false;
+            customersDataTable.AllowUserToDeleteRows = false;
+            customersDataTable.AllowUserToResizeRows = false;
+            customersDataTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            customersDataTable.BackgroundColor = SystemColors.ControlLightLight;
+            customersDataTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            customersDataTable.Columns.AddRange(new DataGridViewColumn[] { customerId, customerName, customerAddress, customerCity, customerCountry, bIsCustomerActive });
+            customersDataTable.Dock = DockStyle.Fill;
+            customersDataTable.EditMode = DataGridViewEditMode.EditProgrammatically;
+            customersDataTable.Location = new Point(3, 53);
+            customersDataTable.MultiSelect = false;
+            customersDataTable.Name = "customersDataTable";
+            customersDataTable.RowHeadersVisible = false;
+            customersDataTable.Size = new Size(1388, 719);
+            customersDataTable.TabIndex = 1;
+            // 
+            // customerId
+            // 
+            customerId.FillWeight = 10F;
+            customerId.HeaderText = "ID";
+            customerId.Name = "customerId";
+            // 
+            // customerName
+            // 
+            customerName.FillWeight = 25F;
+            customerName.HeaderText = "Name";
+            customerName.Name = "customerName";
+            // 
+            // customerAddress
+            // 
+            customerAddress.FillWeight = 35F;
+            customerAddress.HeaderText = "Address";
+            customerAddress.Name = "customerAddress";
+            // 
+            // customerCity
+            // 
+            customerCity.FillWeight = 20F;
+            customerCity.HeaderText = "City";
+            customerCity.Name = "customerCity";
+            // 
+            // customerCountry
+            // 
+            customerCountry.FillWeight = 15F;
+            customerCountry.HeaderText = "Country";
+            customerCountry.Name = "customerCountry";
+            // 
+            // bIsCustomerActive
+            // 
+            bIsCustomerActive.FillWeight = 10F;
+            bIsCustomerActive.HeaderText = "Active";
+            bIsCustomerActive.Name = "bIsCustomerActive";
             // 
             // customersButtonLayoutPanel
             // 
@@ -178,8 +259,8 @@
             maskedTextBox1.BackColor = SystemColors.Control;
             maskedTextBox1.BorderStyle = BorderStyle.None;
             maskedTextBox1.ForeColor = SystemColors.ControlDarkDark;
-            maskedTextBox1.Location = new Point(285, 17);
-            maskedTextBox1.Margin = new Padding(3, 17, 3, 3);
+            maskedTextBox1.Location = new Point(285, 16);
+            maskedTextBox1.Margin = new Padding(3, 16, 3, 3);
             maskedTextBox1.Name = "maskedTextBox1";
             maskedTextBox1.Size = new Size(315, 16);
             maskedTextBox1.TabIndex = 3;
@@ -190,7 +271,7 @@
             appointmentsPage.Location = new Point(4, 34);
             appointmentsPage.Name = "appointmentsPage";
             appointmentsPage.Padding = new Padding(3);
-            appointmentsPage.Size = new Size(1396, 777);
+            appointmentsPage.Size = new Size(1394, 775);
             appointmentsPage.TabIndex = 1;
             appointmentsPage.Text = "Appointments";
             appointmentsPage.UseVisualStyleBackColor = true;
@@ -208,7 +289,7 @@
             // 
             reportsPage.Location = new Point(4, 34);
             reportsPage.Name = "reportsPage";
-            reportsPage.Size = new Size(1396, 777);
+            reportsPage.Size = new Size(1394, 775);
             reportsPage.TabIndex = 3;
             reportsPage.Text = "Reports";
             reportsPage.UseVisualStyleBackColor = true;
@@ -217,28 +298,10 @@
             // 
             loginHistoryPage.Location = new Point(4, 34);
             loginHistoryPage.Name = "loginHistoryPage";
-            loginHistoryPage.Size = new Size(1396, 777);
+            loginHistoryPage.Size = new Size(1394, 775);
             loginHistoryPage.TabIndex = 4;
             loginHistoryPage.Text = "Login History";
             loginHistoryPage.UseVisualStyleBackColor = true;
-            // 
-            // signOutToolStripMenuItem
-            // 
-            signOutToolStripMenuItem.Name = "signOutToolStripMenuItem";
-            signOutToolStripMenuItem.Size = new Size(180, 22);
-            signOutToolStripMenuItem.Text = "Sign Out";
-            // 
-            // exitToolStripMenuItem
-            // 
-            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
-            exitToolStripMenuItem.Text = "Exit";
-            // 
-            // aboutToolStripMenuItem1
-            // 
-            aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            aboutToolStripMenuItem1.Size = new Size(180, 22);
-            aboutToolStripMenuItem1.Text = "About";
             // 
             // MainForm
             // 
@@ -257,6 +320,7 @@
             Main_TabControlPanel.ResumeLayout(false);
             Main_TabControl.ResumeLayout(false);
             customersPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)customersDataTable).EndInit();
             customersButtonLayoutPanel.ResumeLayout(false);
             customersButtonLayoutPanel.PerformLayout();
             ResumeLayout(false);
@@ -283,5 +347,12 @@
         private ToolStripMenuItem signOutToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         private ToolStripMenuItem aboutToolStripMenuItem1;
+        private DataGridView customersDataTable;
+        private DataGridViewTextBoxColumn customerId;
+        private DataGridViewTextBoxColumn customerName;
+        private DataGridViewTextBoxColumn customerAddress;
+        private DataGridViewTextBoxColumn customerCity;
+        private DataGridViewTextBoxColumn customerCountry;
+        private DataGridViewTextBoxColumn bIsCustomerActive;
     }
 }
