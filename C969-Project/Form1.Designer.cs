@@ -39,12 +39,6 @@
             Main_TabControl = new TabControl();
             customersPage = new TabPage();
             customersDataTable = new DataGridView();
-            customerId = new DataGridViewTextBoxColumn();
-            customerName = new DataGridViewTextBoxColumn();
-            customerAddress = new DataGridViewTextBoxColumn();
-            customerCity = new DataGridViewTextBoxColumn();
-            customerCountry = new DataGridViewTextBoxColumn();
-            bIsCustomerActive = new DataGridViewTextBoxColumn();
             customersButtonLayoutPanel = new FlowLayoutPanel();
             addCustomerButton = new Button();
             editCustomerButton = new Button();
@@ -54,6 +48,12 @@
             calendarPage = new TabPage();
             reportsPage = new TabPage();
             loginHistoryPage = new TabPage();
+            customerId = new DataGridViewTextBoxColumn();
+            customerName = new DataGridViewTextBoxColumn();
+            customerAddress = new DataGridViewTextBoxColumn();
+            customerCity = new DataGridViewTextBoxColumn();
+            customerCountry = new DataGridViewTextBoxColumn();
+            active = new DataGridViewTextBoxColumn();
             Main_MenuStripPanel.SuspendLayout();
             Main_MenuStrip.SuspendLayout();
             Main_TabControlPanel.SuspendLayout();
@@ -164,7 +164,7 @@
             customersDataTable.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             customersDataTable.BackgroundColor = SystemColors.ControlLightLight;
             customersDataTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            customersDataTable.Columns.AddRange(new DataGridViewColumn[] { customerId, customerName, customerAddress, customerCity, customerCountry, bIsCustomerActive });
+            customersDataTable.Columns.AddRange(new DataGridViewColumn[] { customerId, customerName, customerAddress, customerCity, customerCountry, active });
             customersDataTable.Dock = DockStyle.Fill;
             customersDataTable.EditMode = DataGridViewEditMode.EditProgrammatically;
             customersDataTable.Location = new Point(3, 53);
@@ -173,42 +173,6 @@
             customersDataTable.RowHeadersVisible = false;
             customersDataTable.Size = new Size(1388, 719);
             customersDataTable.TabIndex = 1;
-            // 
-            // customerId
-            // 
-            customerId.FillWeight = 10F;
-            customerId.HeaderText = "ID";
-            customerId.Name = "customerId";
-            // 
-            // customerName
-            // 
-            customerName.FillWeight = 25F;
-            customerName.HeaderText = "Name";
-            customerName.Name = "customerName";
-            // 
-            // customerAddress
-            // 
-            customerAddress.FillWeight = 35F;
-            customerAddress.HeaderText = "Address";
-            customerAddress.Name = "customerAddress";
-            // 
-            // customerCity
-            // 
-            customerCity.FillWeight = 20F;
-            customerCity.HeaderText = "City";
-            customerCity.Name = "customerCity";
-            // 
-            // customerCountry
-            // 
-            customerCountry.FillWeight = 15F;
-            customerCountry.HeaderText = "Country";
-            customerCountry.Name = "customerCountry";
-            // 
-            // bIsCustomerActive
-            // 
-            bIsCustomerActive.FillWeight = 10F;
-            bIsCustomerActive.HeaderText = "Active";
-            bIsCustomerActive.Name = "bIsCustomerActive";
             // 
             // customersButtonLayoutPanel
             // 
@@ -303,6 +267,48 @@
             loginHistoryPage.Text = "Login History";
             loginHistoryPage.UseVisualStyleBackColor = true;
             // 
+            // customerId
+            // 
+            customerId.DataPropertyName = "CustomerId";
+            customerId.FillWeight = 10F;
+            customerId.HeaderText = "ID";
+            customerId.Name = "customerId";
+            // 
+            // customerName
+            // 
+            customerName.DataPropertyName = "CustomerName";
+            customerName.FillWeight = 25F;
+            customerName.HeaderText = "Name";
+            customerName.Name = "customerName";
+            // 
+            // customerAddress
+            // 
+            customerAddress.DataPropertyName = "Address";
+            customerAddress.FillWeight = 35F;
+            customerAddress.HeaderText = "Address";
+            customerAddress.Name = "customerAddress";
+            // 
+            // customerCity
+            // 
+            customerCity.DataPropertyName = "City";
+            customerCity.FillWeight = 20F;
+            customerCity.HeaderText = "City";
+            customerCity.Name = "customerCity";
+            // 
+            // customerCountry
+            // 
+            customerCountry.DataPropertyName = "Country";
+            customerCountry.FillWeight = 15F;
+            customerCountry.HeaderText = "Country";
+            customerCountry.Name = "customerCountry";
+            // 
+            // active
+            // 
+            active.DataPropertyName = "Active";
+            active.FillWeight = 10F;
+            active.HeaderText = "Active";
+            active.Name = "active";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -313,6 +319,7 @@
             MinimumSize = new Size(1100, 600);
             Name = "MainForm";
             Text = "Global Consulting Scheduler";
+            Load += MainForm_Load;
             Main_MenuStripPanel.ResumeLayout(false);
             Main_MenuStripPanel.PerformLayout();
             Main_MenuStrip.ResumeLayout(false);
@@ -353,6 +360,6 @@
         private DataGridViewTextBoxColumn customerAddress;
         private DataGridViewTextBoxColumn customerCity;
         private DataGridViewTextBoxColumn customerCountry;
-        private DataGridViewTextBoxColumn bIsCustomerActive;
+        private DataGridViewTextBoxColumn active;
     }
 }
