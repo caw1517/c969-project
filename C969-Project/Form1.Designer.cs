@@ -39,6 +39,12 @@
             Main_TabControl = new TabControl();
             customersPage = new TabPage();
             customersDataTable = new DataGridView();
+            customerId = new DataGridViewTextBoxColumn();
+            customerName = new DataGridViewTextBoxColumn();
+            customerAddress = new DataGridViewTextBoxColumn();
+            customerCity = new DataGridViewTextBoxColumn();
+            customerCountry = new DataGridViewTextBoxColumn();
+            active = new DataGridViewTextBoxColumn();
             customersButtonLayoutPanel = new FlowLayoutPanel();
             addCustomerButton = new Button();
             editCustomerButton = new Button();
@@ -48,12 +54,6 @@
             calendarPage = new TabPage();
             reportsPage = new TabPage();
             loginHistoryPage = new TabPage();
-            customerId = new DataGridViewTextBoxColumn();
-            customerName = new DataGridViewTextBoxColumn();
-            customerAddress = new DataGridViewTextBoxColumn();
-            customerCity = new DataGridViewTextBoxColumn();
-            customerCountry = new DataGridViewTextBoxColumn();
-            active = new DataGridViewTextBoxColumn();
             Main_MenuStripPanel.SuspendLayout();
             Main_MenuStrip.SuspendLayout();
             Main_TabControlPanel.SuspendLayout();
@@ -174,6 +174,48 @@
             customersDataTable.Size = new Size(1388, 719);
             customersDataTable.TabIndex = 1;
             // 
+            // customerId
+            // 
+            customerId.DataPropertyName = "CustomerId";
+            customerId.FillWeight = 10F;
+            customerId.HeaderText = "ID";
+            customerId.Name = "customerId";
+            // 
+            // customerName
+            // 
+            customerName.DataPropertyName = "CustomerName";
+            customerName.FillWeight = 25F;
+            customerName.HeaderText = "Name";
+            customerName.Name = "customerName";
+            // 
+            // customerAddress
+            // 
+            customerAddress.DataPropertyName = "Address";
+            customerAddress.FillWeight = 35F;
+            customerAddress.HeaderText = "Address";
+            customerAddress.Name = "customerAddress";
+            // 
+            // customerCity
+            // 
+            customerCity.DataPropertyName = "City";
+            customerCity.FillWeight = 20F;
+            customerCity.HeaderText = "City";
+            customerCity.Name = "customerCity";
+            // 
+            // customerCountry
+            // 
+            customerCountry.DataPropertyName = "Country";
+            customerCountry.FillWeight = 15F;
+            customerCountry.HeaderText = "Country";
+            customerCountry.Name = "customerCountry";
+            // 
+            // active
+            // 
+            active.DataPropertyName = "Active";
+            active.FillWeight = 10F;
+            active.HeaderText = "Active";
+            active.Name = "active";
+            // 
             // customersButtonLayoutPanel
             // 
             customersButtonLayoutPanel.AutoScroll = true;
@@ -207,6 +249,7 @@
             editCustomerButton.TabIndex = 1;
             editCustomerButton.Text = "Edit";
             editCustomerButton.UseVisualStyleBackColor = true;
+            editCustomerButton.Click += editCustomerButton_Click;
             // 
             // deleteCustomerButton
             // 
@@ -267,48 +310,6 @@
             loginHistoryPage.Text = "Login History";
             loginHistoryPage.UseVisualStyleBackColor = true;
             // 
-            // customerId
-            // 
-            customerId.DataPropertyName = "CustomerId";
-            customerId.FillWeight = 10F;
-            customerId.HeaderText = "ID";
-            customerId.Name = "customerId";
-            // 
-            // customerName
-            // 
-            customerName.DataPropertyName = "CustomerName";
-            customerName.FillWeight = 25F;
-            customerName.HeaderText = "Name";
-            customerName.Name = "customerName";
-            // 
-            // customerAddress
-            // 
-            customerAddress.DataPropertyName = "Address";
-            customerAddress.FillWeight = 35F;
-            customerAddress.HeaderText = "Address";
-            customerAddress.Name = "customerAddress";
-            // 
-            // customerCity
-            // 
-            customerCity.DataPropertyName = "City";
-            customerCity.FillWeight = 20F;
-            customerCity.HeaderText = "City";
-            customerCity.Name = "customerCity";
-            // 
-            // customerCountry
-            // 
-            customerCountry.DataPropertyName = "Country";
-            customerCountry.FillWeight = 15F;
-            customerCountry.HeaderText = "Country";
-            customerCountry.Name = "customerCountry";
-            // 
-            // active
-            // 
-            active.DataPropertyName = "Active";
-            active.FillWeight = 10F;
-            active.HeaderText = "Active";
-            active.Name = "active";
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -332,6 +333,8 @@
             customersButtonLayoutPanel.PerformLayout();
             ResumeLayout(false);
         }
+
+        //TODO - Move Tab Control Pages to User Control
 
         #endregion
 

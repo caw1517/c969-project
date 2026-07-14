@@ -1,5 +1,6 @@
 using System.Configuration;
 using C969_Project.Database;
+using C969_Project.Forms;
 using MySql.Data.MySqlClient;
 
 namespace C969_Project
@@ -25,6 +26,23 @@ namespace C969_Project
             customersDataTable.AutoGenerateColumns = false;
             customersDataTable.DataSource = _customers;
             customersDataTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        }
+
+        private void editCustomerButton_Click(object sender, EventArgs e)
+        {
+            if (customersDataTable.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(@"Please select at least one customer to edit.");
+                return;
+            }
+
+            //var editCustomerForm = new EditCustomerForm();
+            //editCustomerForm.ShowDialog();
+
+            using (var frm = new EditCustomerForm())
+            {
+                frm.ShowDialog();
+            }
         }
     }
 }
