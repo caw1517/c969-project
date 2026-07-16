@@ -190,7 +190,7 @@
             // 
             // customerAddress
             // 
-            customerAddress.DataPropertyName = "Address";
+            customerAddress.DataPropertyName = "FullAddress";
             customerAddress.FillWeight = 35F;
             customerAddress.HeaderText = "Address";
             customerAddress.Name = "customerAddress";

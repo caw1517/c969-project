@@ -1,6 +1,6 @@
 ﻿namespace C969_Project.Forms
 {
-    partial class EditCustomerForm
+    partial class CustomerForm
     {
         /// <summary>
         /// Required designer variable.
@@ -288,14 +288,15 @@
             cancelEditCustomerButton.UseVisualStyleBackColor = true;
             cancelEditCustomerButton.Click += cancelEditCustomerButton_Click;
             // 
-            // EditCustomerForm
+            // CustomerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(484, 486);
             Controls.Add(tableLayoutPanel1);
-            Name = "EditCustomerForm";
-            Text = "Edit Customer";
+            Name = "CustomerForm";
+            Text = "Customer";
+            Load += CustomerForm_Load;
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();
             tableLayoutPanel2.ResumeLayout(false);

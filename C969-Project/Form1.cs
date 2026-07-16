@@ -30,17 +30,15 @@ namespace C969_Project
 
         private void editCustomerButton_Click(object sender, EventArgs e)
         {
-            if (customersDataTable.SelectedRows.Count == 0)
+            if (customersDataTable.CurrentRow == null)
             {
                 MessageBox.Show(@"Please select at least one customer to edit.");
                 return;
             }
 
-            //var editCustomerForm = new EditCustomerForm();
-            //editCustomerForm.ShowDialog();
-
-            using (var frm = new EditCustomerForm())
+            if (customersDataTable.CurrentRow.DataBoundItem is CustomerDisplay selectedCustomer)
             {
+                using var frm = new CustomerForm(selectedCustomer);
                 frm.ShowDialog();
             }
         }

@@ -14,6 +14,10 @@ namespace C969_Project.Database
 
         public string Address2 { get; set; } = string.Empty;
 
+        //Lambda - Consider using this as one of the 3 required
+        public string FullAddress =>
+            string.IsNullOrWhiteSpace(Address2) ? Address : $"{Address}, {Address2}";
+
         public string City { get; set; } = string.Empty;
 
         public string Country { get; set; } = string.Empty;
