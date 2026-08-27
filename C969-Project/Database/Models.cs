@@ -10,9 +10,9 @@ namespace C969_Project.Database
 
         public string CreatedBy { get; set; } = string.Empty;
 
-        public DateTime UpdatedDate { get; set; }
+        public DateTime LastUpdate { get; init; }
 
-        public string LastUpdatedBy { get; set; } = string.Empty;
+        public string LastUpdateBy { get; set; } = string.Empty;
     }
 
     public class Customer : AuditableModel
