@@ -1,14 +1,12 @@
-using System.Configuration;
 using C969_Project.Database;
 using C969_Project.Forms;
-using MySql.Data.MySqlClient;
 
 namespace C969_Project
 {
     public partial class MainForm : Form
     {
-        private string connectionString;
-        private List<CustomerDisplay> _customers;
+        //private string _connectionString;
+        private List<CustomerDisplay>? _customers;
 
         public MainForm()
         {
@@ -38,9 +36,15 @@ namespace C969_Project
 
             if (customersDataTable.CurrentRow.DataBoundItem is CustomerDisplay selectedCustomer)
             {
-                using var frm = new CustomerForm(selectedCustomer);
-                frm.ShowDialog();
+                using var customerForm = new CustomerForm(selectedCustomer);
+                customerForm.ShowDialog();
             }
+        }
+
+        private void addCustomerButton_Click(object sender, EventArgs e)
+        {
+            using var customerForm = new CustomerForm();
+            customerForm.ShowDialog();
         }
     }
 }

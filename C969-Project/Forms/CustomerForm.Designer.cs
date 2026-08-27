@@ -40,13 +40,13 @@
             phoneEditCustomerTextBox = new TextBox();
             addressEditCustomerTextBox = new TextBox();
             address2EditCustomerTextBox = new TextBox();
-            cityEditCustomerTextBox = new TextBox();
             postalEditCustomerTextBox = new TextBox();
-            countryEditCustomerTextBox = new TextBox();
             activeEditCustomerCheckBox = new CheckBox();
             tableLayoutPanel2 = new TableLayoutPanel();
             saveEditCustomerButton = new Button();
             cancelEditCustomerButton = new Button();
+            cityCustomerSelectBox = new ComboBox();
+            countryCustomerSelectBox = new ComboBox();
             tableLayoutPanel1.SuspendLayout();
             tableLayoutPanel2.SuspendLayout();
             SuspendLayout();
@@ -69,11 +69,11 @@
             tableLayoutPanel1.Controls.Add(phoneEditCustomerTextBox, 2, 2);
             tableLayoutPanel1.Controls.Add(addressEditCustomerTextBox, 2, 3);
             tableLayoutPanel1.Controls.Add(address2EditCustomerTextBox, 2, 4);
-            tableLayoutPanel1.Controls.Add(cityEditCustomerTextBox, 2, 5);
             tableLayoutPanel1.Controls.Add(postalEditCustomerTextBox, 2, 6);
-            tableLayoutPanel1.Controls.Add(countryEditCustomerTextBox, 2, 7);
             tableLayoutPanel1.Controls.Add(activeEditCustomerCheckBox, 2, 8);
             tableLayoutPanel1.Controls.Add(tableLayoutPanel2, 2, 9);
+            tableLayoutPanel1.Controls.Add(cityCustomerSelectBox, 2, 5);
+            tableLayoutPanel1.Controls.Add(countryCustomerSelectBox, 2, 7);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -195,6 +195,7 @@
             // 
             // addressEditCustomerTextBox
             // 
+            addressEditCustomerTextBox.BorderStyle = BorderStyle.FixedSingle;
             addressEditCustomerTextBox.Dock = DockStyle.Fill;
             addressEditCustomerTextBox.Location = new Point(114, 131);
             addressEditCustomerTextBox.Margin = new Padding(3, 13, 3, 3);
@@ -204,6 +205,7 @@
             // 
             // address2EditCustomerTextBox
             // 
+            address2EditCustomerTextBox.BorderStyle = BorderStyle.FixedSingle;
             address2EditCustomerTextBox.Dock = DockStyle.Fill;
             address2EditCustomerTextBox.Location = new Point(114, 180);
             address2EditCustomerTextBox.Margin = new Padding(3, 13, 3, 3);
@@ -211,32 +213,15 @@
             address2EditCustomerTextBox.Size = new Size(341, 23);
             address2EditCustomerTextBox.TabIndex = 10;
             // 
-            // cityEditCustomerTextBox
-            // 
-            cityEditCustomerTextBox.Dock = DockStyle.Fill;
-            cityEditCustomerTextBox.Location = new Point(114, 229);
-            cityEditCustomerTextBox.Margin = new Padding(3, 13, 3, 3);
-            cityEditCustomerTextBox.Name = "cityEditCustomerTextBox";
-            cityEditCustomerTextBox.Size = new Size(341, 23);
-            cityEditCustomerTextBox.TabIndex = 11;
-            // 
             // postalEditCustomerTextBox
             // 
+            postalEditCustomerTextBox.BorderStyle = BorderStyle.FixedSingle;
             postalEditCustomerTextBox.Dock = DockStyle.Fill;
             postalEditCustomerTextBox.Location = new Point(114, 278);
             postalEditCustomerTextBox.Margin = new Padding(3, 13, 3, 3);
             postalEditCustomerTextBox.Name = "postalEditCustomerTextBox";
             postalEditCustomerTextBox.Size = new Size(341, 23);
             postalEditCustomerTextBox.TabIndex = 12;
-            // 
-            // countryEditCustomerTextBox
-            // 
-            countryEditCustomerTextBox.Dock = DockStyle.Fill;
-            countryEditCustomerTextBox.Location = new Point(114, 327);
-            countryEditCustomerTextBox.Margin = new Padding(3, 13, 3, 3);
-            countryEditCustomerTextBox.Name = "countryEditCustomerTextBox";
-            countryEditCustomerTextBox.Size = new Size(341, 23);
-            countryEditCustomerTextBox.TabIndex = 13;
             // 
             // activeEditCustomerCheckBox
             // 
@@ -275,6 +260,7 @@
             saveEditCustomerButton.TabIndex = 0;
             saveEditCustomerButton.Text = "Save";
             saveEditCustomerButton.UseVisualStyleBackColor = true;
+            saveEditCustomerButton.Click += saveEditCustomerButton_Click;
             // 
             // cancelEditCustomerButton
             // 
@@ -287,6 +273,26 @@
             cancelEditCustomerButton.Text = "Cancel";
             cancelEditCustomerButton.UseVisualStyleBackColor = true;
             cancelEditCustomerButton.Click += cancelEditCustomerButton_Click;
+            // 
+            // cityCustomerSelectBox
+            // 
+            cityCustomerSelectBox.Dock = DockStyle.Fill;
+            cityCustomerSelectBox.FormattingEnabled = true;
+            cityCustomerSelectBox.Location = new Point(114, 229);
+            cityCustomerSelectBox.Margin = new Padding(3, 13, 3, 3);
+            cityCustomerSelectBox.Name = "cityCustomerSelectBox";
+            cityCustomerSelectBox.Size = new Size(341, 23);
+            cityCustomerSelectBox.TabIndex = 16;
+            // 
+            // countryCustomerSelectBox
+            // 
+            countryCustomerSelectBox.Dock = DockStyle.Fill;
+            countryCustomerSelectBox.FormattingEnabled = true;
+            countryCustomerSelectBox.Location = new Point(114, 327);
+            countryCustomerSelectBox.Margin = new Padding(3, 13, 3, 3);
+            countryCustomerSelectBox.Name = "countryCustomerSelectBox";
+            countryCustomerSelectBox.Size = new Size(341, 23);
+            countryCustomerSelectBox.TabIndex = 17;
             // 
             // CustomerForm
             // 
@@ -317,12 +323,12 @@
         private TextBox phoneEditCustomerTextBox;
         private TextBox addressEditCustomerTextBox;
         private TextBox address2EditCustomerTextBox;
-        private TextBox cityEditCustomerTextBox;
         private TextBox postalEditCustomerTextBox;
-        private TextBox countryEditCustomerTextBox;
         private CheckBox activeEditCustomerCheckBox;
         private TableLayoutPanel tableLayoutPanel2;
         private Button saveEditCustomerButton;
         private Button cancelEditCustomerButton;
+        private ComboBox cityCustomerSelectBox;
+        private ComboBox countryCustomerSelectBox;
     }
 }

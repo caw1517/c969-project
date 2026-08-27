@@ -9,7 +9,7 @@ namespace C969_Project.Database
 {
     public class DatabaseManager
     {
-        public static MySqlConnection Conn { get; set; }
+        public static MySqlConnection? Conn { get; set; }
 
         public static void StartConnection()
         {

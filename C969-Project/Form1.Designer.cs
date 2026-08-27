@@ -239,6 +239,7 @@
             addCustomerButton.TabIndex = 0;
             addCustomerButton.Text = "Add";
             addCustomerButton.UseVisualStyleBackColor = true;
+            addCustomerButton.Click += addCustomerButton_Click;
             // 
             // editCustomerButton
             // 

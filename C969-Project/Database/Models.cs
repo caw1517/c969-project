@@ -25,4 +25,20 @@ namespace C969_Project.Database
 
         public bool Active { get; set; }
     }
+
+    public class Country : AuditableModel
+    {
+        public int CountryId { get; set; }
+
+        public string CountryName { get; set; } = String.Empty;
+    }
+
+    public class City : AuditableModel
+    {
+        public int CityId { get; set; }
+
+        public string CityName { get; set; } = string.Empty;
+
+        public int CountryId { get; set; }
+    }
 }
