@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace C969_Project.Database
@@ -21,8 +20,6 @@ namespace C969_Project.Database
                 Conn = new MySqlConnection(connectionString);
 
                 Conn.Open();
-
-                MessageBox.Show("Connected to Database");
             }
             catch (MySqlException ex)
             {
