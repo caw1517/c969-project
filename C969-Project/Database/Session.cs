@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace C969_Project.Database
 {
     public static class Session
@@ -12,13 +8,13 @@ namespace C969_Project.Database
         public static void Start(string username, int userId)
         {
             CurrentUserId = userId;
-            CurrentUsername = username;
+            CurrentUserName = username;
         }
 
         public static void Clear()
         {
             CurrentUserId = 0;
-            CurrentUsername = string.Empty;
+            CurrentUserName = string.Empty;
         }
     }
 }
