@@ -19,7 +19,6 @@ namespace C969_Project.Forms
         {
             DialogResult = DialogResult.OK;
             Close();
-
         }
     }
 }
