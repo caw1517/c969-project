@@ -20,9 +20,6 @@ namespace C969_Project
             //Clear our current session
             Session.Clear();
 
-            //Initialize Database
-            DatabaseManager.StartConnection();
-
             //Verify Login
 
             try

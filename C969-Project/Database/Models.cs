@@ -41,4 +41,11 @@ namespace C969_Project.Database
 
         public int CountryId { get; set; }
     }
+
+    public class User : AuditableModel
+    {
+        public int UserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public bool Active { get; set; }
+    }
 }

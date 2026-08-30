@@ -269,8 +269,8 @@
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             tableLayoutPanel3.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            tableLayoutPanel3.Controls.Add(loginFormLoginButton, 2, 0);
-            tableLayoutPanel3.Controls.Add(loginFormCancelButton, 1, 0);
+            tableLayoutPanel3.Controls.Add(loginFormLoginButton, 1, 0);
+            tableLayoutPanel3.Controls.Add(loginFormCancelButton, 2, 0);
             tableLayoutPanel3.Dock = DockStyle.Fill;
             tableLayoutPanel3.Location = new Point(3, 267);
             tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -283,7 +283,7 @@
             // loginFormLoginButton
             // 
             loginFormLoginButton.Dock = DockStyle.Fill;
-            loginFormLoginButton.Location = new Point(324, 3);
+            loginFormLoginButton.Location = new Point(217, 3);
             loginFormLoginButton.Name = "loginFormLoginButton";
             loginFormLoginButton.Size = new Size(101, 39);
             loginFormLoginButton.TabIndex = 3;
@@ -294,12 +294,13 @@
             // loginFormCancelButton
             // 
             loginFormCancelButton.Dock = DockStyle.Fill;
-            loginFormCancelButton.Location = new Point(217, 3);
+            loginFormCancelButton.Location = new Point(324, 3);
             loginFormCancelButton.Name = "loginFormCancelButton";
             loginFormCancelButton.Size = new Size(101, 39);
             loginFormCancelButton.TabIndex = 4;
             loginFormCancelButton.Text = "Cancel";
             loginFormCancelButton.UseVisualStyleBackColor = true;
+            loginFormCancelButton.Click += loginFormCancelButton_Click;
             // 
             // label6
             // 
