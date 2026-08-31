@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using C969_Project.Database;
+using C969_Project.Modules;
 using MySql.Data.MySqlClient;
 
 namespace C969_Project.Forms
@@ -49,9 +50,9 @@ namespace C969_Project.Forms
                     return;
                 }
 
-                //Start the session
+                //Start the session and log the login
                 Session.Start(authenticatedUser.UserName, authenticatedUser.UserId);
-
+                LoginHistoryModule.RecordLogin(authenticatedUser.UserName);
                 DialogResult = DialogResult.OK;
             }
             catch (Exception)
