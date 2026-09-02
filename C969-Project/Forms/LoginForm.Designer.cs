@@ -34,16 +34,16 @@
             loginFormHeaderSubLabel = new Label();
             loginGroupBox = new GroupBox();
             tableLayoutPanel1 = new TableLayoutPanel();
-            label1 = new Label();
-            label2 = new Label();
-            label3 = new Label();
+            loginFormOfficeLabel = new Label();
+            loginFormLanguageLabel = new Label();
+            loginFormTimeZoneLabel = new Label();
             loginFormOfficeComboBox = new ComboBox();
             loginFormLanguageComboBox = new ComboBox();
             tableLayoutPanel2 = new TableLayoutPanel();
-            label4 = new Label();
-            label5 = new Label();
+            loginFormUsernameLabel = new Label();
             loginFormUsernameInput = new TextBox();
             loginFormPasswordInput = new TextBox();
+            loginFormPasswordLabel = new Label();
             tableLayoutPanel3 = new TableLayoutPanel();
             loginFormLoginButton = new Button();
             loginFormCancelButton = new Button();
@@ -136,9 +136,9 @@
             tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35.191803F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64.8082F));
-            tableLayoutPanel1.Controls.Add(label1, 0, 0);
-            tableLayoutPanel1.Controls.Add(label2, 0, 1);
-            tableLayoutPanel1.Controls.Add(label3, 0, 2);
+            tableLayoutPanel1.Controls.Add(loginFormOfficeLabel, 0, 0);
+            tableLayoutPanel1.Controls.Add(loginFormLanguageLabel, 0, 1);
+            tableLayoutPanel1.Controls.Add(loginFormTimeZoneLabel, 0, 2);
             tableLayoutPanel1.Controls.Add(loginFormOfficeComboBox, 1, 0);
             tableLayoutPanel1.Controls.Add(loginFormLanguageComboBox, 1, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
@@ -151,42 +151,42 @@
             tableLayoutPanel1.Size = new Size(422, 74);
             tableLayoutPanel1.TabIndex = 0;
             // 
-            // label1
+            // loginFormOfficeLabel
             // 
-            label1.AutoSize = true;
-            label1.Dock = DockStyle.Fill;
-            label1.ForeColor = Color.Black;
-            label1.Location = new Point(3, 0);
-            label1.Name = "label1";
-            label1.Size = new Size(142, 27);
-            label1.TabIndex = 0;
-            label1.Text = "Office:";
-            label1.TextAlign = ContentAlignment.MiddleLeft;
+            loginFormOfficeLabel.AutoSize = true;
+            loginFormOfficeLabel.Dock = DockStyle.Fill;
+            loginFormOfficeLabel.ForeColor = Color.Black;
+            loginFormOfficeLabel.Location = new Point(3, 0);
+            loginFormOfficeLabel.Name = "loginFormOfficeLabel";
+            loginFormOfficeLabel.Size = new Size(142, 27);
+            loginFormOfficeLabel.TabIndex = 0;
+            loginFormOfficeLabel.Text = "Office:";
+            loginFormOfficeLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // label2
+            // loginFormLanguageLabel
             // 
-            label2.AutoSize = true;
-            label2.Dock = DockStyle.Fill;
-            label2.ForeColor = Color.Black;
-            label2.Location = new Point(3, 27);
-            label2.Name = "label2";
-            label2.Size = new Size(142, 27);
-            label2.TabIndex = 1;
-            label2.Text = "Language:";
-            label2.TextAlign = ContentAlignment.MiddleLeft;
+            loginFormLanguageLabel.AutoSize = true;
+            loginFormLanguageLabel.Dock = DockStyle.Fill;
+            loginFormLanguageLabel.ForeColor = Color.Black;
+            loginFormLanguageLabel.Location = new Point(3, 27);
+            loginFormLanguageLabel.Name = "loginFormLanguageLabel";
+            loginFormLanguageLabel.Size = new Size(142, 27);
+            loginFormLanguageLabel.TabIndex = 1;
+            loginFormLanguageLabel.Text = "Language:";
+            loginFormLanguageLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
-            // label3
+            // loginFormTimeZoneLabel
             // 
-            label3.AutoSize = true;
-            label3.Dock = DockStyle.Fill;
-            label3.Font = new Font("Segoe UI", 8F);
-            label3.ForeColor = SystemColors.GrayText;
-            label3.Location = new Point(3, 54);
-            label3.Name = "label3";
-            label3.Size = new Size(142, 20);
-            label3.TabIndex = 2;
-            label3.Text = "Eastern Time (New York)";
-            label3.TextAlign = ContentAlignment.MiddleLeft;
+            loginFormTimeZoneLabel.AutoSize = true;
+            loginFormTimeZoneLabel.Dock = DockStyle.Fill;
+            loginFormTimeZoneLabel.Font = new Font("Segoe UI", 8F);
+            loginFormTimeZoneLabel.ForeColor = SystemColors.GrayText;
+            loginFormTimeZoneLabel.Location = new Point(3, 54);
+            loginFormTimeZoneLabel.Name = "loginFormTimeZoneLabel";
+            loginFormTimeZoneLabel.Size = new Size(142, 20);
+            loginFormTimeZoneLabel.TabIndex = 2;
+            loginFormTimeZoneLabel.Text = "Eastern Time (New York)";
+            loginFormTimeZoneLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // loginFormOfficeComboBox
             // 
@@ -205,46 +205,38 @@
             loginFormLanguageComboBox.Name = "loginFormLanguageComboBox";
             loginFormLanguageComboBox.Size = new Size(268, 23);
             loginFormLanguageComboBox.TabIndex = 4;
+            loginFormLanguageComboBox.SelectedIndexChanged += loginFormLanguageComboBox_SelectedIndexChanged;
             // 
             // tableLayoutPanel2
             // 
             tableLayoutPanel2.ColumnCount = 2;
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35.51402F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 64.4859848F));
-            tableLayoutPanel2.Controls.Add(label4, 0, 0);
-            tableLayoutPanel2.Controls.Add(label5, 0, 1);
+            tableLayoutPanel2.Controls.Add(loginFormUsernameLabel, 0, 0);
             tableLayoutPanel2.Controls.Add(loginFormUsernameInput, 1, 0);
-            tableLayoutPanel2.Controls.Add(loginFormPasswordInput, 1, 1);
+            tableLayoutPanel2.Controls.Add(loginFormPasswordInput, 1, 2);
+            tableLayoutPanel2.Controls.Add(loginFormPasswordLabel, 0, 2);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(3, 165);
             tableLayoutPanel2.Name = "tableLayoutPanel2";
-            tableLayoutPanel2.RowCount = 2;
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayoutPanel2.RowCount = 4;
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
+            tableLayoutPanel2.RowStyles.Add(new RowStyle(SizeType.Percent, 25F));
             tableLayoutPanel2.Size = new Size(428, 96);
             tableLayoutPanel2.TabIndex = 5;
             // 
-            // label4
+            // loginFormUsernameLabel
             // 
-            label4.AutoSize = true;
-            label4.Dock = DockStyle.Fill;
-            label4.Location = new Point(3, 0);
-            label4.Name = "label4";
-            label4.Size = new Size(146, 48);
-            label4.TabIndex = 0;
-            label4.Text = "Username: ";
-            label4.TextAlign = ContentAlignment.MiddleLeft;
-            // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Dock = DockStyle.Fill;
-            label5.Location = new Point(3, 48);
-            label5.Name = "label5";
-            label5.Size = new Size(146, 48);
-            label5.TabIndex = 1;
-            label5.Text = "Password: ";
-            label5.TextAlign = ContentAlignment.MiddleLeft;
+            loginFormUsernameLabel.AutoSize = true;
+            loginFormUsernameLabel.Dock = DockStyle.Fill;
+            loginFormUsernameLabel.Location = new Point(3, 6);
+            loginFormUsernameLabel.Margin = new Padding(3, 6, 3, 0);
+            loginFormUsernameLabel.Name = "loginFormUsernameLabel";
+            loginFormUsernameLabel.Size = new Size(146, 18);
+            loginFormUsernameLabel.TabIndex = 0;
+            loginFormUsernameLabel.Text = "Username: ";
             // 
             // loginFormUsernameInput
             // 
@@ -262,6 +254,17 @@
             loginFormPasswordInput.PasswordChar = '*';
             loginFormPasswordInput.Size = new Size(270, 23);
             loginFormPasswordInput.TabIndex = 3;
+            // 
+            // loginFormPasswordLabel
+            // 
+            loginFormPasswordLabel.AutoSize = true;
+            loginFormPasswordLabel.Dock = DockStyle.Fill;
+            loginFormPasswordLabel.Location = new Point(3, 54);
+            loginFormPasswordLabel.Margin = new Padding(3, 6, 3, 0);
+            loginFormPasswordLabel.Name = "loginFormPasswordLabel";
+            loginFormPasswordLabel.Size = new Size(146, 18);
+            loginFormPasswordLabel.TabIndex = 1;
+            loginFormPasswordLabel.Text = "Password: ";
             // 
             // tableLayoutPanel3
             // 
@@ -343,14 +346,14 @@
         private Button loginFormLoginButton;
         private GroupBox loginGroupBox;
         private TableLayoutPanel tableLayoutPanel1;
-        private Label label1;
-        private Label label2;
-        private Label label3;
+        private Label loginFormOfficeLabel;
+        private Label loginFormLanguageLabel;
+        private Label loginFormTimeZoneLabel;
         private ComboBox loginFormOfficeComboBox;
         private ComboBox loginFormLanguageComboBox;
         private TableLayoutPanel tableLayoutPanel2;
-        private Label label4;
-        private Label label5;
+        private Label loginFormUsernameLabel;
+        private Label loginFormPasswordLabel;
         private TextBox loginFormUsernameInput;
         private TextBox loginFormPasswordInput;
         private TableLayoutPanel tableLayoutPanel3;

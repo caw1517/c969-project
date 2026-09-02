@@ -4,19 +4,30 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using C969_Project.Database;
 using C969_Project.Modules;
+using C969_Project.Resources;
 using MySql.Data.MySqlClient;
 
 namespace C969_Project.Forms
 {
     public partial class LoginForm : Form
     {
+
+        private readonly string localTimeZoneDisplayName = TimeZoneInfo.Local.DisplayName;
+        private bool isInitializingLanguage;
+
+
         public LoginForm()
         {
+
             InitializeComponent();
+            loginFormTimeZoneLabel.Text = $"{LoginStrings.LocationLabel}: {localTimeZoneDisplayName}";
+            ApplyLocalizedStrings();
+            SetLanguageOptions();
         }
 
         private void loginFormLoginButton_Click(object sender, EventArgs e)
@@ -28,7 +39,8 @@ namespace C969_Project.Forms
             if (!ValidateLoginInput(username, password))
             {
                 return;
-            };
+            }
+            ;
 
             try
             {
@@ -42,8 +54,8 @@ namespace C969_Project.Forms
                 if (authenticatedUser is null)
                 {
                     MessageBox.Show(
-                        "Invalid username or password",
-                        "Error",
+                        LoginStrings.InvalidCredentials,
+                        LoginStrings.ErrorTitle,
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
 
@@ -58,8 +70,8 @@ namespace C969_Project.Forms
             catch (Exception)
             {
                 MessageBox.Show(
-                    "Error connecting to the database.",
-                    "Error",
+                    LoginStrings.DatabaseError,
+                    LoginStrings.ErrorTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
 
@@ -74,8 +86,8 @@ namespace C969_Project.Forms
             if (string.IsNullOrWhiteSpace(username))
             {
                 MessageBox.Show(
-                    "Username is required.",
-                    "Error",
+                    LoginStrings.UsernameRequired,
+                    LoginStrings.ErrorTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return false;
@@ -84,8 +96,8 @@ namespace C969_Project.Forms
             if (string.IsNullOrEmpty(password))
             {
                 MessageBox.Show(
-                    "Password is required.",
-                    "Error",
+                    LoginStrings.PasswordRequired,
+                    LoginStrings.ErrorTitle,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
@@ -99,6 +111,68 @@ namespace C969_Project.Forms
         private void loginFormCancelButton_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void ApplyLocalizedStrings()
+        {
+            Text = LoginStrings.FormTitle;
+            loginFormHeaderLabel.Text = LoginStrings.HeaderTitle;
+            loginFormHeaderSubLabel.Text = LoginStrings.HeaderSubtitle;
+            loginGroupBox.Text = LoginStrings.LocationLanguageGroup;
+            loginFormUsernameLabel.Text = LoginStrings.UsernameLabel;
+            loginFormPasswordLabel.Text = LoginStrings.PasswordLabel;
+            loginFormLoginButton.Text = LoginStrings.LoginButton;
+            loginFormCancelButton.Text = LoginStrings.CancelButton;
+            loginFormOfficeLabel.Text = LoginStrings.OfficeLabel;
+            loginFormLanguageLabel.Text = LoginStrings.LanguageLabel;
+        }
+
+        private class LanguageSelection
+        {
+            public string Name { get; set; }
+            public string LanguageCode { get; set; }
+        }
+
+        List<LanguageSelection> languages = new List<LanguageSelection>
+        {
+            new LanguageSelection {Name = "English", LanguageCode = "en"},
+            new LanguageSelection {Name = "Deutsch", LanguageCode = "de"},
+        };
+
+        private void SetLanguageOptions()
+        {
+            loginFormLanguageComboBox.DataSource = languages;
+            loginFormLanguageComboBox.DisplayMember = "Name";
+            loginFormLanguageComboBox.ValueMember = "LanguageCode";
+
+            string currentLanguage = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+            LanguageSelection initialSelection =
+                languages.FirstOrDefault(language => language.LanguageCode == currentLanguage) ?? languages[0];
+
+            isInitializingLanguage = true;
+            try
+            {
+                loginFormLanguageComboBox.DataSource = languages;
+                loginFormLanguageComboBox.DisplayMember = "Name";
+                loginFormLanguageComboBox.ValueMember = "LanguageCode";
+                loginFormLanguageComboBox.SelectedItem = initialSelection;
+            }
+            finally
+            {
+                isInitializingLanguage = false;
+            }
+
+        }
+
+        private void loginFormLanguageComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (loginFormLanguageComboBox.SelectedItem is LanguageSelection selectedLanguage)
+            {
+                CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(selectedLanguage.LanguageCode);
+                CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo(selectedLanguage.LanguageCode);
+                ApplyLocalizedStrings();
+            }
         }
     }
 }
