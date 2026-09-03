@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Text;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace C969_Project.Database
 {
@@ -12,35 +14,44 @@ namespace C969_Project.Database
 
         public static void StartConnection()
         {
+            if (Conn is { State: ConnectionState.Open })
+            {
+                return;
+            }
+
+            EndConnection();
+
             string connectionString = ConfigurationManager.ConnectionStrings["localDb"].ConnectionString;
 
-
+            var conn = new MySqlConnection(connectionString);
             try
             {
-                Conn = new MySqlConnection(connectionString);
-
-                Conn.Open();
+                conn.Open();
+                Conn = conn;          // assign only after a successful open
             }
-            catch (MySqlException ex)
+            catch
             {
-                MessageBox.Show(ex.Message);
+                conn.Dispose();
+                Conn = null;          // never leave a dead object behind
+                throw;                // let the caller decide what the user sees
             }
+
         }
 
         public static void EndConnection()
         {
+
             try
             {
-                if (Conn != null)
-                {
-                    Conn.Close();
-                }
-
-                Conn = null;
+                Conn?.Dispose();
             }
-            catch (MySqlException ex)
+            catch (MySqlException)
             {
-                MessageBox.Show(ex.Message);
+                // nothing useful a user can do about a failed close
+            }
+            finally
+            {
+                Conn = null;          // always
             }
         }
 
@@ -77,6 +88,40 @@ namespace C969_Project.Database
             }
 
             return customers;
+        }
+
+        public static User? AuthenticateUser(string username, string password)
+        {
+
+            
+            const string sql = @"
+                            SELECT userId, userName, active
+                            FROM `user`
+                            WHERE userName = @username
+                                AND password = @password
+                                AND active = 1
+                            LIMIT 1";
+
+            using (var cmd = new MySqlCommand(sql, Conn))
+            {
+                cmd.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
+                cmd.Parameters.Add("@password", MySqlDbType.VarChar).Value = password;
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (!reader.Read())
+                    {
+                        return null;
+                    }
+
+                    return new User
+                    {
+                        UserId = reader.GetInt32("userId"),
+                        UserName = reader.GetString("userName"),
+                        Active = reader.GetBoolean("active")
+                    };
+                }
+            }
         }
     }
 }
