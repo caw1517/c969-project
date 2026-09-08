@@ -27,20 +27,18 @@ namespace C969_Project.Database
             try
             {
                 conn.Open();
-                Conn = conn;          // assign only after a successful open
+                Conn = conn; // assign only after a successful open
             }
             catch
             {
                 conn.Dispose();
-                Conn = null;          // never leave a dead object behind
-                throw;                // let the caller decide what the user sees
+                Conn = null; // never leave a dead object behind
+                throw; // let the caller decide what the user sees
             }
-
         }
 
         public static void EndConnection()
         {
-
             try
             {
                 Conn?.Dispose();
@@ -51,7 +49,7 @@ namespace C969_Project.Database
             }
             finally
             {
-                Conn = null;          // always
+                Conn = null; // always
             }
         }
 
@@ -67,24 +65,22 @@ namespace C969_Project.Database
                             JOIN country co ON co.countryId = ci.countryId
                             ORDER BY c.customerName";
 
-            using (var cmd = new MySqlCommand(sql, Conn))
-            using (var reader = cmd.ExecuteReader())
+            using var cmd = new MySqlCommand(sql, Conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                while (reader.Read())
+                customers.Add(new CustomerDisplay
                 {
-                    customers.Add(new CustomerDisplay
-                    {
-                        CustomerId = reader.GetInt32("customerId"),
-                        CustomerName = reader.GetString("customerName"),
-                        Active = reader.GetBoolean("active"),
-                        Address = reader.GetString("address"),
-                        Address2 = reader.GetString("address2"),
-                        PostalCode = reader.GetString("postalCode"),
-                        City = reader.GetString("city"),
-                        Country = reader.GetString("country"),
-                        Phone = reader.GetString("phone")
-                    });
-                }
+                    CustomerId = reader.GetInt32("customerId"),
+                    CustomerName = reader.GetString("customerName"),
+                    Active = reader.GetBoolean("active"),
+                    Address = reader.GetString("address"),
+                    Address2 = reader.GetString("address2"),
+                    PostalCode = reader.GetString("postalCode"),
+                    City = reader.GetString("city"),
+                    Country = reader.GetString("country"),
+                    Phone = reader.GetString("phone")
+                });
             }
 
             return customers;
@@ -92,8 +88,6 @@ namespace C969_Project.Database
 
         public static User? AuthenticateUser(string username, string password)
         {
-
-            
             const string sql = @"
                             SELECT userId, userName, active
                             FROM `user`
@@ -102,26 +96,75 @@ namespace C969_Project.Database
                                 AND active = 1
                             LIMIT 1";
 
-            using (var cmd = new MySqlCommand(sql, Conn))
+            using var cmd = new MySqlCommand(sql, Conn);
+            cmd.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
+            cmd.Parameters.Add("@password", MySqlDbType.VarChar).Value = password;
+
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read())
             {
-                cmd.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
-                cmd.Parameters.Add("@password", MySqlDbType.VarChar).Value = password;
-
-                using (var reader = cmd.ExecuteReader())
-                {
-                    if (!reader.Read())
-                    {
-                        return null;
-                    }
-
-                    return new User
-                    {
-                        UserId = reader.GetInt32("userId"),
-                        UserName = reader.GetString("userName"),
-                        Active = reader.GetBoolean("active")
-                    };
-                }
+                return null;
             }
+
+            return new User
+            {
+                UserId = reader.GetInt32("userId"),
+                UserName = reader.GetString("userName"),
+                Active = reader.GetBoolean("active")
+            };
+        }
+
+        public static List<Country>? GetCountryList()
+        {
+            var countryList = new List<Country>();
+
+            string sql = @"SELECT countryId, country
+                            FROM country
+                            ORDER BY country";
+
+            using var cmd = new MySqlCommand(sql, Conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                countryList.Add(new Country()
+                {
+                    CountryId = reader.GetInt32("countryId"),
+                    CountryName = reader.GetString("country")
+                });
+            }
+
+            if (countryList.Count == 0)
+                return null;
+
+            return countryList;
+        }
+
+        public static List<City>? GetCityByCountry(int countryId)
+        {
+            var cityList = new List<City>();
+
+            string sql = @"SELECT cityId, city AS cityName
+                            FROM city
+                            WHERE countryId = @countryId
+                            ORDER BY city";
+
+            using var cmd = new MySqlCommand(sql, Conn);
+            cmd.Parameters.Add("@countryId", MySqlDbType.Int32).Value = countryId;
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                cityList.Add(new City()
+                {
+                    CityId = reader.GetInt32("cityId"),
+                    CityName = reader.GetString("cityName"),
+                });
+            }
+
+            if (cityList.Count == 0)
+                return null;
+
+            return cityList;
         }
     }
 }

@@ -1,18 +1,20 @@
-﻿using System;
+﻿using C969_Project.Database;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using C969_Project.Database;
 
 namespace C969_Project.Forms
 {
     public partial class CustomerForm : Form
     {
-
         private CustomerDisplay? _customer;
+        Country activeCountry = null;
+
         private readonly CustomerFormType _formType;
 
 
@@ -22,6 +24,8 @@ namespace C969_Project.Forms
             InitializeComponent();
             _formType = CustomerFormType.Add;
             this.Text = @"Add new customer";
+
+            SetupCityCountryDropDowns();
         }
 
         //Edit the customer - fill in text boxes with existing data
@@ -66,11 +70,9 @@ namespace C969_Project.Forms
 
             if (_formType == CustomerFormType.Add)
             {
-
             }
             else if (_formType == CustomerFormType.Edit)
             {
-
             }
         }
 
@@ -78,13 +80,20 @@ namespace C969_Project.Forms
         {
             List<string> validationErrors = new List<string>();
 
-            if(string.IsNullOrWhiteSpace(nameEditCustomerTextBox.Text))
+            if (string.IsNullOrWhiteSpace(nameEditCustomerTextBox.Text))
                 validationErrors.Add("Customer name must not be empty.");
 
-            if(string.IsNullOrWhiteSpace(phoneEditCustomerTextBox.Text))
+            if (string.IsNullOrWhiteSpace(phoneEditCustomerTextBox.Text))
                 validationErrors.Add("Phone number must not be empty.");
 
-            if(string.IsNullOrWhiteSpace(addressEditCustomerTextBox.Text))
+            var phone = phoneEditCustomerTextBox.Text.Trim();
+
+            if (phone.Length > 0 && !Regex.IsMatch(phone, @"\A[0-9-]*[0-9][0-9-]*\z"))
+            {
+                validationErrors.Add("Phone number must contain only digits and dashes.");
+            }
+
+            if (string.IsNullOrWhiteSpace(addressEditCustomerTextBox.Text))
                 validationErrors.Add("Customer address must not be empty.");
 
             //if(string.IsNullOrWhiteSpace(cityEditCustomerTextBox.Text))
@@ -97,6 +106,37 @@ namespace C969_Project.Forms
             //    validationErrors.Add("Country must not be empty.");
 
             return validationErrors;
+        }
+
+        private void SetupCityCountryDropDowns()
+        {
+            List<Country>? countries = DatabaseManager.GetCountryList();
+            List<City>? cities;
+
+            if (countries != null)
+            {
+                countryCustomerSelectBox.DisplayMember = "CountryName";
+                countryCustomerSelectBox.ValueMember = "CountryId";
+                countryCustomerSelectBox.DataSource = countries;
+                countryCustomerSelectBox.SelectedIndex = -1;
+
+                countryCustomerSelectBox.SelectedIndexChanged += countryCustomerSelectBox_SelectedIndexChanged;
+
+            }
+        }
+
+        private void countryCustomerSelectBox_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            cityCustomerSelectBox.DataSource = null;
+
+            if (countryCustomerSelectBox.SelectedValue is int countryId)
+            {
+                cityCustomerSelectBox.DisplayMember = "CityName";
+                cityCustomerSelectBox.ValueMember = "CityId";
+                cityCustomerSelectBox.DataSource = DatabaseManager.GetCityByCountry(countryId);
+            }
+
+            cityCustomerSelectBox.SelectedIndex = -1;
         }
     }
 }
