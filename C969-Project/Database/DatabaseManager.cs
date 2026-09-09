@@ -258,5 +258,47 @@ namespace C969_Project.Database
                 throw;
             }
         }
+
+        public static void DeleteCustomer(int customerId, int addressId)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                string deleteCustomerSql = @"DELETE FROM customer WHERE customerId = @customerId";
+                string deleteAddressSql = @"DELETE FROM address WHERE addressId = @addressId";
+
+                using var deleteCustomerCmd = new MySqlCommand(deleteCustomerSql, connection, transaction);
+                deleteCustomerCmd.Parameters.Add("@customerId", MySqlDbType.Int32).Value = customerId;
+
+                deleteCustomerCmd.ExecuteNonQuery();
+
+                using var deleteAddressCmd = new MySqlCommand(deleteAddressSql, connection, transaction);
+                deleteAddressCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value = addressId;
+
+                deleteAddressCmd.ExecuteNonQuery();
+
+                transaction.Commit();
+
+            }
+            catch
+            {
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception rollbackError)
+                {
+                    System.Diagnostics.Debug.WriteLine(rollbackError);
+                }
+
+                throw;
+            }
+        }
     }
 }

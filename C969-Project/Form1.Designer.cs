@@ -173,6 +173,7 @@
             customersDataTable.RowHeadersVisible = false;
             customersDataTable.Size = new Size(1388, 719);
             customersDataTable.TabIndex = 1;
+            customersDataTable.DataBindingComplete += customersDataTable_DataBindingComplete;
             // 
             // customerId
             // 
@@ -261,6 +262,7 @@
             deleteCustomerButton.TabIndex = 2;
             deleteCustomerButton.Text = "Delete";
             deleteCustomerButton.UseVisualStyleBackColor = true;
+            deleteCustomerButton.Click += deleteCustomerButton_Click;
             // 
             // maskedTextBox1
             // 
