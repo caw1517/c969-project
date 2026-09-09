@@ -58,7 +58,7 @@ namespace C969_Project.Database
             var customers = new List<CustomerDisplay>();
 
             string sql = @"
-                            SELECT c.customerId, c.CustomerName, c.active, a.address, a.address2, a.postalCode, a.phone, ci.city, co.country
+                            SELECT c.customerId, a.addressId, ci.cityId, co.countryId, c.customerName, c.active, a.address, a.address2, a.postalCode, a.phone, ci.city, co.country
                             FROM customer c
                             JOIN address a ON c.addressId = a.addressId
                             JOIN city ci ON a.cityId = ci.cityId
@@ -79,7 +79,10 @@ namespace C969_Project.Database
                     PostalCode = reader.GetString("postalCode"),
                     City = reader.GetString("city"),
                     Country = reader.GetString("country"),
-                    Phone = reader.GetString("phone")
+                    Phone = reader.GetString("phone"),
+                    AddressId = reader.GetInt32("addressId"),
+                    CityId = reader.GetInt32("cityId"),
+                    CountryId = reader.GetInt32("countryId"),
                 });
             }
 
@@ -165,6 +168,95 @@ namespace C969_Project.Database
                 return null;
 
             return cityList;
+        }
+
+        public static void AddCustomer(Customer customer, Address address)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            var createdAt = DateTime.UtcNow;
+            var createdBy = Session.CurrentUserName;
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                const string addressSql = @"
+            INSERT INTO address
+                (address, address2, cityId, postalCode, phone,
+                 createDate, createdBy, lastUpdateBy)
+            VALUES
+                (@address, @address2, @cityId, @postalCode, @phone,
+                 @createDate, @createdBy, @lastUpdateBy)";
+
+                using var addressCmd =
+                    new MySqlCommand(addressSql, connection, transaction);
+
+                addressCmd.Parameters.Add("@address", MySqlDbType.VarChar).Value =
+                    address.PrimaryAddress;
+                addressCmd.Parameters.Add("@address2", MySqlDbType.VarChar).Value =
+                    address.Address2 ?? string.Empty;
+                addressCmd.Parameters.Add("@cityId", MySqlDbType.Int32).Value =
+                    address.CityId;
+                addressCmd.Parameters.Add("@postalCode", MySqlDbType.VarChar).Value =
+                    address.PostalCode;
+                addressCmd.Parameters.Add("@phone", MySqlDbType.VarChar).Value =
+                    address.Phone;
+                addressCmd.Parameters.Add("@createDate", MySqlDbType.DateTime).Value =
+                    createdAt;
+                addressCmd.Parameters.Add("@createdBy", MySqlDbType.VarChar).Value =
+                    createdBy;
+                addressCmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar).Value =
+                    createdBy;
+
+                addressCmd.ExecuteNonQuery();
+
+                int addressId = checked((int)addressCmd.LastInsertedId);
+
+                const string customerSql = @"
+            INSERT INTO customer
+                (customerName, addressId, active,
+                 createDate, createdBy, lastUpdateBy)
+            VALUES
+                (@customerName, @addressId, @active,
+                 @createDate, @createdBy, @lastUpdateBy)";
+
+                using var customerCmd =
+                    new MySqlCommand(customerSql, connection, transaction);
+
+                customerCmd.Parameters.Add("@customerName", MySqlDbType.VarChar).Value =
+                    customer.CustomerName;
+                customerCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value =
+                    addressId;
+                customerCmd.Parameters.Add("@active", MySqlDbType.Int32).Value =
+                    customer.Active ? 1 : 0;
+                customerCmd.Parameters.Add("@createDate", MySqlDbType.DateTime).Value =
+                    createdAt;
+                customerCmd.Parameters.Add("@createdBy", MySqlDbType.VarChar).Value =
+                    createdBy;
+                customerCmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar).Value =
+                    createdBy;
+
+                customerCmd.ExecuteNonQuery();
+
+                transaction.Commit();
+            }
+            catch
+            {
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception rollbackError)
+                {
+                    System.Diagnostics.Debug.WriteLine(rollbackError);
+                }
+
+                throw;
+            }
         }
     }
 }

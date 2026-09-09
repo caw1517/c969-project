@@ -44,7 +44,10 @@ namespace C969_Project
         private void addCustomerButton_Click(object sender, EventArgs e)
         {
             using var customerForm = new CustomerForm();
-            customerForm.ShowDialog();
+            if (customerForm.ShowDialog() == DialogResult.OK)
+            {
+                LoadCustomers();
+            }
         }
     }
 }

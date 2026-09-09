@@ -32,6 +32,7 @@ namespace C969_Project.Forms
         public CustomerForm(CustomerDisplay customer)
         {
             InitializeComponent();
+            SetupCityCountryDropDowns();
             _customer = customer;
             _formType = CustomerFormType.Edit;
             this.Text = @"Edit Customer";
@@ -42,6 +43,7 @@ namespace C969_Project.Forms
             this.DialogResult = DialogResult.Cancel;
         }
 
+
         private void CustomerForm_Load(object sender, EventArgs e)
         {
             //If the customer is populated then we are editing
@@ -51,61 +53,126 @@ namespace C969_Project.Forms
                 phoneEditCustomerTextBox.Text = _customer.Phone;
                 addressEditCustomerTextBox.Text = _customer.Address;
                 address2EditCustomerTextBox.Text = _customer.Address2;
-                //cityEditCustomerTextBox.Text = _customer.City;
                 postalEditCustomerTextBox.Text = _customer.PostalCode;
-                //countryEditCustomerTextBox.Text = _customer.Country;
                 activeEditCustomerCheckBox.Checked = _customer.Active;
+                countryCustomerSelectBox.SelectedValue = _customer.CountryId;
+                cityCustomerSelectBox.SelectedValue = _customer.CityId;
             }
         }
 
         private void saveEditCustomerButton_Click(object sender, EventArgs e)
         {
+            TrimInput();
             var validationErrors = ValidateCustomerInput();
 
             if (validationErrors.Any())
             {
                 MessageBox.Show(string.Join("\n", validationErrors), @"Please fix the following.", MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
+
+                return;
             }
 
             if (_formType == CustomerFormType.Add)
             {
+                var customerToAdd = new Customer
+                {
+                    CustomerName = nameEditCustomerTextBox.Text,
+                    Active = activeEditCustomerCheckBox.Checked
+                };
+
+                var addressToAdd = new Address
+                {
+                    PrimaryAddress = addressEditCustomerTextBox.Text,
+                    Address2 = address2EditCustomerTextBox.Text,
+                    CityId = (int)cityCustomerSelectBox.SelectedValue,
+                    PostalCode = postalEditCustomerTextBox.Text,
+                    Phone = phoneEditCustomerTextBox.Text
+                };
+
+                try
+                {
+                    DatabaseManager.AddCustomer(customerToAdd, addressToAdd);
+                    DialogResult = DialogResult.OK;
+                }
+                catch
+                {
+                    MessageBox.Show(
+                        "Unable to add the customer. No changes were saved.\n\n" +
+                        "Please check your database connection and try again. " +
+                        "If the problem continues, contact support.",
+                        "Add Customer Failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
             }
             else if (_formType == CustomerFormType.Edit)
             {
             }
         }
 
+        private void TrimInput()
+        {
+            nameEditCustomerTextBox.Text = nameEditCustomerTextBox.Text.Trim();
+            phoneEditCustomerTextBox.Text = phoneEditCustomerTextBox.Text.Trim();
+            addressEditCustomerTextBox.Text = addressEditCustomerTextBox.Text.Trim();
+            address2EditCustomerTextBox.Text = address2EditCustomerTextBox.Text.Trim();
+            postalEditCustomerTextBox.Text = postalEditCustomerTextBox.Text.Trim();
+        }
+
         private List<string> ValidateCustomerInput()
         {
-            List<string> validationErrors = new List<string>();
+            var errors = new List<string>();
 
-            if (string.IsNullOrWhiteSpace(nameEditCustomerTextBox.Text))
-                validationErrors.Add("Customer name must not be empty.");
+            string name = nameEditCustomerTextBox.Text;
+            string phone = phoneEditCustomerTextBox.Text;
+            string address = addressEditCustomerTextBox.Text;
+            string address2 = address2EditCustomerTextBox.Text;
+            string postalCode = postalEditCustomerTextBox.Text;
 
-            if (string.IsNullOrWhiteSpace(phoneEditCustomerTextBox.Text))
-                validationErrors.Add("Phone number must not be empty.");
+            // Required fields
+            if (string.IsNullOrWhiteSpace(name))
+                errors.Add("Enter a customer name.");
 
-            var phone = phoneEditCustomerTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(address))
+                errors.Add("Enter a primary address.");
 
-            if (phone.Length > 0 && !Regex.IsMatch(phone, @"\A[0-9-]*[0-9][0-9-]*\z"))
+            if (string.IsNullOrWhiteSpace(phone))
+                errors.Add("Enter a phone number.");
+
+            if (string.IsNullOrWhiteSpace(postalCode))
+                errors.Add("Enter a postal code.");
+
+            if (countryCustomerSelectBox.SelectedValue is not int)
+                errors.Add("Select a country.");
+
+            if (cityCustomerSelectBox.SelectedValue is not int)
+                errors.Add("Select a city.");
+
+            // Fixed database column limits
+            if (name.Length > 45)
+                errors.Add("Customer name must be 45 characters or fewer.");
+
+            if (address.Length > 50)
+                errors.Add("Primary address must be 50 characters or fewer.");
+
+            if (address2.Length > 50)
+                errors.Add("Address line 2 must be 50 characters or fewer.");
+
+            if (postalCode.Length > 10)
+                errors.Add("Postal code must be 10 characters or fewer.");
+
+            if (phone.Length > 20)
+                errors.Add("Phone number must be 20 characters or fewer.");
+
+            // Skip empty phone values because the required-field check handles them.
+            if (phone.Length > 0 &&
+                !Regex.IsMatch(phone, @"\A[0-9-]+\z"))
             {
-                validationErrors.Add("Phone number must contain only digits and dashes.");
+                errors.Add("Phone number may contain only digits (0–9) and dashes (-).");
             }
 
-            if (string.IsNullOrWhiteSpace(addressEditCustomerTextBox.Text))
-                validationErrors.Add("Customer address must not be empty.");
-
-            //if(string.IsNullOrWhiteSpace(cityEditCustomerTextBox.Text))
-            //    validationErrors.Add("City must not be empty.");
-
-            if (string.IsNullOrWhiteSpace(postalEditCustomerTextBox.Text))
-                validationErrors.Add("Postal code must not be empty.");
-
-            //if(string.IsNullOrWhiteSpace(countryEditCustomerTextBox.Text))
-            //    validationErrors.Add("Country must not be empty.");
-
-            return validationErrors;
+            return errors;
         }
 
         private void SetupCityCountryDropDowns()
@@ -121,7 +188,6 @@ namespace C969_Project.Forms
                 countryCustomerSelectBox.SelectedIndex = -1;
 
                 countryCustomerSelectBox.SelectedIndexChanged += countryCustomerSelectBox_SelectedIndexChanged;
-
             }
         }
 
