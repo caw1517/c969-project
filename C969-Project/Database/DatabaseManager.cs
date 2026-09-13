@@ -284,7 +284,90 @@ namespace C969_Project.Database
                 deleteAddressCmd.ExecuteNonQuery();
 
                 transaction.Commit();
+            }
+            catch
+            {
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (Exception rollbackError)
+                {
+                    System.Diagnostics.Debug.WriteLine(rollbackError);
+                }
 
+                throw;
+            }
+        }
+
+        public static void EditCustomer(Customer customerToEdit, Address addressToEdit)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                string findCustomerSql = @"SELECT 1 FROM customer WHERE customerId = @customerId";
+                using var findCustomerCmd = new MySqlCommand(findCustomerSql, connection, transaction);
+                findCustomerCmd.Parameters.Add("@customerId", MySqlDbType.Int32).Value = customerToEdit.CustomerId;
+
+                if (findCustomerCmd.ExecuteScalar() == null)
+                {
+                    throw new InvalidOperationException("Customer not found.");
+                }
+
+                string findAddressSql = @"SELECT 1 FROM address WHERE addressId = @addressId";
+                using var findAddressCmd = new MySqlCommand(findAddressSql, connection, transaction);
+                findAddressCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value = addressToEdit.AddressId;
+
+                if (findAddressCmd.ExecuteScalar() == null)
+                {
+                    throw new InvalidOperationException("Address not found.");
+                }
+
+                string updateCustomerSql =
+                    @"UPDATE customer 
+                        SET customerName =  @customerName,  active = @active, lastUpdateBy = @lastUpdateBy 
+                        WHERE customerId = @customerId";
+
+                string updateAddressSql =
+                    @"UPDATE address
+                    SET address = @address, address2 = @address2, cityId = @cityId,  postalCode = @postalCode, phone = @phone, lastUpdateBy = @lastUpdateBy
+                    WHERE addressId = @addressId";
+
+                /*UPDATE CUSTOMER*/
+                using var updateCustomerCmd = new MySqlCommand(updateCustomerSql, connection, transaction);
+                updateCustomerCmd.Parameters.Add("@customerName", MySqlDbType.VarChar).Value =
+                    customerToEdit.CustomerName;
+                updateCustomerCmd.Parameters.Add("@active", MySqlDbType.Int32).Value = customerToEdit.Active ? 1 : 0;
+                updateCustomerCmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar)
+                    .Value = Session.CurrentUserName;
+                updateCustomerCmd.Parameters.Add("@customerId", MySqlDbType.Int32)
+                    .Value = customerToEdit.CustomerId;
+
+                int customerRows = updateCustomerCmd.ExecuteNonQuery();
+                if(customerRows != 1)
+                    throw new InvalidOperationException("Customer update did not match exactly one row.");
+                
+                /*UPDATE ADDRESS*/
+                using var updateAddressCmd = new MySqlCommand(updateAddressSql, connection, transaction);
+                updateAddressCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value =  addressToEdit.AddressId;
+                updateAddressCmd.Parameters.Add("@address",  MySqlDbType.VarChar).Value =  addressToEdit.PrimaryAddress;
+                updateAddressCmd.Parameters.Add("@address2", MySqlDbType.VarChar).Value = addressToEdit.Address2;
+                updateAddressCmd.Parameters.Add("@cityId", MySqlDbType.Int32).Value = addressToEdit.CityId;
+                updateAddressCmd.Parameters.Add("@postalCode", MySqlDbType.VarChar).Value = addressToEdit.PostalCode;
+                updateAddressCmd.Parameters.Add("@phone", MySqlDbType.VarChar).Value = addressToEdit.Phone;
+                updateAddressCmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar).Value = Session.CurrentUserName;
+                
+                int addressRows = updateAddressCmd.ExecuteNonQuery();
+                if (addressRows != 1)
+                    throw new InvalidOperationException("Address update did not match exactly one row.");
+                
+                transaction.Commit();
             }
             catch
             {
