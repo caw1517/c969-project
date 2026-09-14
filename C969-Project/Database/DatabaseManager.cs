@@ -170,6 +170,61 @@ namespace C969_Project.Database
             return cityList;
         }
 
+        public static Customer? GetSingleCustomer(int customerId)
+        {
+            const string sql =
+                @"SELECT customerId, customerName, addressId, active, createDate, createdBy, lastUpdate, lastUpdateBy FROM customer WHERE customerId = @customerId";
+
+            using var cmd = new MySqlCommand(sql, Conn);
+            cmd.Parameters.Add("@customerId", MySqlDbType.Int32).Value = customerId;
+
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read())
+                return null;
+
+            var customerToReturn = new Customer
+            {
+                CustomerId = reader.GetInt32("customerId"),
+                CustomerName = reader.GetString("customerName"),
+                Active = reader.GetBoolean("active"),
+                CreateDate = reader.GetDateTime("createDate"),
+                CreatedBy = reader.GetString("createdBy"),
+                LastUpdate = reader.GetDateTime("lastUpdate"),
+                LastUpdateBy = reader.GetString("lastUpdateBy"),
+                AddressId = reader.GetInt32("addressId")
+            };
+
+            return customerToReturn;
+        }
+
+        public static Address? GetSingleAddress(int addressId)
+        {
+            const string sql =
+                @"SELECT addressId, address, address2, cityId, postalCode, phone, createDate, createdBy, lastUpdate, lastUpdateBy FROM address WHERE addressId = @addressId";
+
+            using var cmd = new MySqlCommand(sql, Conn);
+            cmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value = addressId;
+
+            using var reader = cmd.ExecuteReader();
+            if (!reader.Read())
+                return null;
+            
+            var addressToReturn = new Address
+            {
+                AddressId = reader.GetInt32("addressId"),
+                PrimaryAddress = reader.GetString("address"),
+                Address2 = reader.GetString("address2"),
+                CityId = reader.GetInt32("cityId"),
+                PostalCode = reader.GetString("postalCode"),
+                Phone = reader.GetString("phone"),
+                CreateDate = reader.GetDateTime("createDate"),
+                CreatedBy = reader.GetString("createdBy"),
+                LastUpdate = reader.GetDateTime("lastUpdate"),
+                LastUpdateBy = reader.GetString("lastUpdateBy"),
+            };
+            return addressToReturn;
+        }
+        
         public static void AddCustomer(Customer customer, Address address)
         {
             var connection = Conn;
@@ -350,23 +405,23 @@ namespace C969_Project.Database
                     .Value = customerToEdit.CustomerId;
 
                 int customerRows = updateCustomerCmd.ExecuteNonQuery();
-                if(customerRows != 1)
+                if (customerRows != 1)
                     throw new InvalidOperationException("Customer update did not match exactly one row.");
-                
+
                 /*UPDATE ADDRESS*/
                 using var updateAddressCmd = new MySqlCommand(updateAddressSql, connection, transaction);
-                updateAddressCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value =  addressToEdit.AddressId;
-                updateAddressCmd.Parameters.Add("@address",  MySqlDbType.VarChar).Value =  addressToEdit.PrimaryAddress;
+                updateAddressCmd.Parameters.Add("@addressId", MySqlDbType.Int32).Value = addressToEdit.AddressId;
+                updateAddressCmd.Parameters.Add("@address", MySqlDbType.VarChar).Value = addressToEdit.PrimaryAddress;
                 updateAddressCmd.Parameters.Add("@address2", MySqlDbType.VarChar).Value = addressToEdit.Address2;
                 updateAddressCmd.Parameters.Add("@cityId", MySqlDbType.Int32).Value = addressToEdit.CityId;
                 updateAddressCmd.Parameters.Add("@postalCode", MySqlDbType.VarChar).Value = addressToEdit.PostalCode;
                 updateAddressCmd.Parameters.Add("@phone", MySqlDbType.VarChar).Value = addressToEdit.Phone;
                 updateAddressCmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar).Value = Session.CurrentUserName;
-                
+
                 int addressRows = updateAddressCmd.ExecuteNonQuery();
                 if (addressRows != 1)
                     throw new InvalidOperationException("Address update did not match exactly one row.");
-                
+
                 transaction.Commit();
             }
             catch

@@ -28,7 +28,7 @@ namespace C969_Project.Forms
             SetupCityCountryDropDowns();
         }
 
-        //Edit the customer - fill in text boxes with existing data
+        //Edit the customer - fill-in text boxes with existing data
         public CustomerForm(CustomerDisplay customer)
         {
             InitializeComponent();
@@ -108,6 +108,43 @@ namespace C969_Project.Forms
             }
             else if (_formType == CustomerFormType.Edit)
             {
+                try
+                {
+                    if (_customer != null)
+                    {
+                        var customerToEdit = DatabaseManager.GetSingleCustomer(_customer.CustomerId);
+                        var addressToEdit = DatabaseManager.GetSingleAddress(_customer.AddressId);
+
+                        if (customerToEdit is null || addressToEdit is null)
+                        {
+                            throw new Exception("Unable to retrieve customer or address from database.");
+                        }
+
+                        customerToEdit.CustomerName = nameEditCustomerTextBox.Text;
+                        customerToEdit.Active = activeEditCustomerCheckBox.Checked;
+
+                        addressToEdit.PrimaryAddress = addressEditCustomerTextBox.Text;
+                        addressToEdit.Address2 = address2EditCustomerTextBox.Text;
+                        addressToEdit.CityId = (int)(cityCustomerSelectBox.SelectedValue ??
+                                                     throw new InvalidOperationException("City does not exist."));
+                        addressToEdit.PostalCode = postalEditCustomerTextBox.Text;
+                        addressToEdit.Phone = phoneEditCustomerTextBox.Text;
+                        
+                        DatabaseManager.EditCustomer(customerToEdit, addressToEdit);
+                        DialogResult = DialogResult.OK;
+
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show(
+                        "Unable to edit the customer. No changes were saved.\n\n" +
+                        "Please check your database connection and try again. " +
+                        "If the problem continues, contact support.",
+                        "Edit Customer Failed",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
             }
         }
 

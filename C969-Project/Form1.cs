@@ -39,7 +39,22 @@ namespace C969_Project
             if (customersDataTable.CurrentRow.DataBoundItem is CustomerDisplay selectedCustomer)
             {
                 using var customerForm = new CustomerForm(selectedCustomer);
-                customerForm.ShowDialog();
+                if (customerForm.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        LoadCustomers();
+                    }
+                    catch (Exception exception)
+                    {
+                        MessageBox.Show(
+                            "The customer was updated, but the list could not be refreshed. " +
+                            "Reopen the customer screen to reload it.",
+                            "Refresh Failed",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 
