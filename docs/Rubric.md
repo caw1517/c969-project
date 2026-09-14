@@ -17,6 +17,11 @@ evaluator in their own terms.
 code is written. Fill **Evidence** with the class/method that satisfies it — that's what you
 need if it comes back for revision. Tag `#blocker` on anything stuck and it surfaces on [[_C969-Hub]].
 
+> [!note] Review status — 2026-09-02
+> `[x]` marks an item supported by the evidence available in this review. Runtime-dependent
+> items remain unchecked unless they were actually exercised in the running app. The project
+> rebuild succeeds, but it reports three compiler warnings and no automated test project exists.
+
 > [!warning] Hard constraints from the task
 > - **No frameworks or external libraries except the .NET Framework.**
 > - The database has no data — you must populate it.
@@ -28,11 +33,16 @@ need if it comes back for revision. Tag `#blocker` on anything stuck and it surf
 
 ## A1 — Login Form
 
-- [ ] **A1a** — Log-in form accurately determines a user's location
-- [ ] **A1b** — Form translates log-in *and error control* messages into English and one additional language
-- [ ] **A1c** — Consistently and accurately verifies the correct username and password
+- [x] **A1a** — Log-in form accurately determines a user's location *(verified in login-form smoke test)*
+- [x] **A1b** — Form translates log-in *and error control* messages into English and one additional language *(verified: English/German login, error, and time-zone labels)*
+- [x] **A1c** — Consistently and accurately verifies the correct username and password *(verified: valid, invalid, and inactive-user cases)*
 
-**Evidence:**
+**Evidence:** `LoginForm` uses `TimeZoneInfo.Local.DisplayName` for the location label, and the
+running test displayed the expected Pacific time-zone value. `LoginStrings` contains
+English/German resources, and the completed tests verified the localized login/error controls and
+time-zone label. `DatabaseManager.AuthenticateUser` uses parameterized checks; the completed tests
+verified the valid `test`/`test` case plus invalid and inactive-user rejection. The committed
+`sql/seed.sql` still does not recreate the complete required user state on an empty database.
 
 ## A2 — Customer Records
 
@@ -46,7 +56,10 @@ need if it comes back for revision. Tag `#blocker` on anything stuck and it surf
     - [ ] update
     - [ ] delete database
 
-**Evidence:**
+**Evidence:** Not implemented. `CustomerForm.saveEditCustomerButton_Click` has empty Add/Edit
+branches, `deleteCustomerButton` has no handler, and the validation only checks blankness. It does
+not trim fields, enforce digits-and-dashes-only phone input, write to the database, refresh the
+grid, or handle add/update/delete exceptions.
 
 ## A3 — Appointments
 
@@ -59,7 +72,9 @@ need if it comes back for revision. Tag `#blocker` on anything stuck and it surf
     - [ ] update
     - [ ] delete database
 
-**Evidence:**
+**Evidence:** Not implemented. There is no appointment model, CRUD query, appointment form, type
+capture, customer link, business-hours validation, overlap check, or operation-specific exception
+handling. The Appointments tab is an empty placeholder.
 
 ## A4 — Calendar View
 
@@ -67,19 +82,22 @@ need if it comes back for revision. Tag `#blocker` on anything stuck and it surf
 
 > Note: the rubric asks for month view + select-a-day. It does *not* require a separate week view.
 
-**Evidence:**
+**Evidence:** Not implemented. The Calendar tab is an empty placeholder; no month calendar,
+appointment display, or day-selection filter exists.
 
 ## A5 — Time Zones
 
 - [ ] **A5** — Appointment times automatically adjust based on user time zone **and daylight saving time**
 
-**Evidence:**
+**Evidence:** Not implemented. No UTC/local/eastern conversion helper or appointment read/write
+path exists, so daylight-saving adjustment cannot currently occur.
 
 ## A6 — Alerts
 
 - [ ] **A6** — On login, alert the user if they have an appointment within 15 minutes
 
-**Evidence:**
+**Evidence:** Not implemented. Login does not query the current user's upcoming appointments or
+display a 15-minute alert.
 
 ## A7 — Reports
 
@@ -92,23 +110,28 @@ The rubric explicitly fails this if "less than 3 of the reports incorporate a la
 - [ ] All three use collection classes
 - [ ] All three each contain a lambda expression
 
-**Evidence:**
+**Evidence:** Not implemented. The Reports tab is an empty placeholder; none of the three required
+reports, collection-based processing, or three separate lambdas exists. The additional report has
+not yet been selected.
 
 ## A8 — Activity Log
 
-- [ ] **A8** — Record timestamp and username of each login to a text file named exactly `Login_History.txt`
-- [ ] Each new record is **appended** — the rubric explicitly fails this if each login creates a new file
+- [x] **A8** — Record timestamp and username of each login to a text file named exactly `Login_History.txt` *(verified: three successful logins recorded)*
+- [x] Each new record is **appended** — the rubric explicitly fails this if each login creates a new file *(verified: all three records remained in one file)*
 
-**Evidence:**
+**Evidence:** `LoginHistoryModule.RecordLogin` builds the exact filename, writes a UTC timestamp
+and username, and calls `File.AppendAllText`; `LoginForm` calls it after successful authentication.
+The completed runtime verification confirmed three successful logins produced three records in
+the same `Login_History.txt` file.
 
 ## B — Submission
 
-- [ ] **B1** — Project saved/exported in Visual Studio format
+- [x] **B1** — Project saved/exported in Visual Studio format *(verified: `.slnx`/`.csproj` and successful rebuild)*
 - [ ] **B2** — Project **completely** exported as a ZIP (folder/project structure intact)
 
 ## C — Professional Communication
 
-- [ ] **C** — Grammar, spelling, punctuation, and fluency throughout the submission
+- [ ] **C** — Grammar, spelling, punctuation, and fluency throughout the submission *(open: visible strings include “Adress” and “Calender”)*
 
 ---
 
@@ -130,8 +153,26 @@ Useful for sanity-checking that your design actually demonstrates each one:
 
 Not named in this version's rubric — I checked. Worth doing regardless:
 
-- [ ] Parameterized queries everywhere, no string concatenation into SQL
+- [x] Parameterized queries everywhere, no string concatenation into SQL *(all current user-input SQL is parameterized; CRUD SQL does not exist yet)*
 - [ ] Timestamps stored UTC in the DB, converted for display. Not optional in practice: the schema has **no time zone column and `start`/`end` are bare `DATETIME`**, so UTC storage is what makes A3a (9–5 EST) and A5 (user tz + DST) both achievable. See [[Schema]].
+
+---
+
+## Verification Notes — 2026-09-02
+
+- `dotnet build C969-Project.slnx --no-restore -t:Rebuild` succeeds with 0 errors and 3 warnings
+  in `LoginForm.cs` (two uninitialized non-nullable properties and one unused field).
+- The completed runtime verification covered the local Pacific time-zone label, English/German
+  login and error localization, valid/invalid/inactive login cases, and three successful login
+  history writes. A1b, A1c, A8, and the append requirement are now marked complete.
+- A read-only check of the configured local database found 4 countries, 7 cities, 3 addresses,
+  3 customers, 2 users, and 2 appointments; the committed `sql/seed.sql` still does not recreate
+  that complete state on an empty database.
+- The hard constraint against external libraries remains open: `C969-Project.csproj` references
+  `MySql.Data`.
+- The project targets `net10.0-windows`, while the hard constraint says “.NET Framework”; this
+  compatibility point predates the review range and should be confirmed with the evaluator.
+- No automated test files or test projects are present.
 
 ---
 

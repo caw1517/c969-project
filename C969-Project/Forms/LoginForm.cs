@@ -25,7 +25,6 @@ namespace C969_Project.Forms
         {
 
             InitializeComponent();
-            loginFormTimeZoneLabel.Text = $"{LoginStrings.LocationLabel}: {localTimeZoneDisplayName}";
             ApplyLocalizedStrings();
             SetLanguageOptions();
         }
@@ -125,6 +124,7 @@ namespace C969_Project.Forms
             loginFormCancelButton.Text = LoginStrings.CancelButton;
             loginFormOfficeLabel.Text = LoginStrings.OfficeLabel;
             loginFormLanguageLabel.Text = LoginStrings.LanguageLabel;
+            loginFormTimeZoneLabel.Text = $"{LoginStrings.LocationLabel}{localTimeZoneDisplayName}";
         }
 
         private class LanguageSelection

@@ -43,7 +43,7 @@
             postalEditCustomerTextBox = new TextBox();
             activeEditCustomerCheckBox = new CheckBox();
             tableLayoutPanel2 = new TableLayoutPanel();
-            saveEditCustomerButton = new Button();
+            customerFormSaveButton = new Button();
             cancelEditCustomerButton = new Button();
             cityCustomerSelectBox = new ComboBox();
             countryCustomerSelectBox = new ComboBox();
@@ -240,7 +240,7 @@
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 40F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
             tableLayoutPanel2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30F));
-            tableLayoutPanel2.Controls.Add(saveEditCustomerButton, 1, 0);
+            tableLayoutPanel2.Controls.Add(customerFormSaveButton, 1, 0);
             tableLayoutPanel2.Controls.Add(cancelEditCustomerButton, 2, 0);
             tableLayoutPanel2.Dock = DockStyle.Fill;
             tableLayoutPanel2.Location = new Point(114, 415);
@@ -250,17 +250,17 @@
             tableLayoutPanel2.Size = new Size(341, 43);
             tableLayoutPanel2.TabIndex = 15;
             // 
-            // saveEditCustomerButton
+            // customerFormSaveButton
             // 
-            saveEditCustomerButton.Dock = DockStyle.Fill;
-            saveEditCustomerButton.Location = new Point(140, 4);
-            saveEditCustomerButton.Margin = new Padding(4);
-            saveEditCustomerButton.Name = "saveEditCustomerButton";
-            saveEditCustomerButton.Size = new Size(94, 35);
-            saveEditCustomerButton.TabIndex = 0;
-            saveEditCustomerButton.Text = "Save";
-            saveEditCustomerButton.UseVisualStyleBackColor = true;
-            saveEditCustomerButton.Click += saveEditCustomerButton_Click;
+            customerFormSaveButton.Dock = DockStyle.Fill;
+            customerFormSaveButton.Location = new Point(140, 4);
+            customerFormSaveButton.Margin = new Padding(4);
+            customerFormSaveButton.Name = "customerFormSaveButton";
+            customerFormSaveButton.Size = new Size(94, 35);
+            customerFormSaveButton.TabIndex = 0;
+            customerFormSaveButton.Text = "Save";
+            customerFormSaveButton.UseVisualStyleBackColor = true;
+            customerFormSaveButton.Click += saveEditCustomerButton_Click;
             // 
             // cancelEditCustomerButton
             // 
@@ -326,7 +326,7 @@
         private TextBox postalEditCustomerTextBox;
         private CheckBox activeEditCustomerCheckBox;
         private TableLayoutPanel tableLayoutPanel2;
-        private Button saveEditCustomerButton;
+        private Button customerFormSaveButton;
         private Button cancelEditCustomerButton;
         private ComboBox cityCustomerSelectBox;
         private ComboBox countryCustomerSelectBox;

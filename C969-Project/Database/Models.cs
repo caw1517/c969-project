@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Google.Protobuf.WellKnownTypes;
 
 namespace C969_Project.Database
 {
@@ -47,5 +48,15 @@ namespace C969_Project.Database
         public int UserId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public bool Active { get; set; }
+    }
+
+    public class Address : AuditableModel
+    {
+        public int AddressId { get; set; }
+        public string PrimaryAddress { get; set; } = string.Empty;
+        public string Address2 { get; set; } = string.Empty;
+        public int CityId { get; set; }
+        public string PostalCode { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
     }
 }

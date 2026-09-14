@@ -27,5 +27,9 @@ namespace C969_Project.Database
         public string Phone { get; set; } = string.Empty;
 
         public bool Active { get; set; }
+
+        public int AddressId { get; set; }
+        public int CityId { get; set; }
+        public int CountryId { get; set; }
     }
 }
