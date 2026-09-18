@@ -208,7 +208,7 @@ namespace C969_Project.Database
             using var reader = cmd.ExecuteReader();
             if (!reader.Read())
                 return null;
-            
+
             var addressToReturn = new Address
             {
                 AddressId = reader.GetInt32("addressId"),
@@ -224,7 +224,7 @@ namespace C969_Project.Database
             };
             return addressToReturn;
         }
-        
+
         public static void AddCustomer(Customer customer, Address address)
         {
             var connection = Conn;
@@ -437,6 +437,46 @@ namespace C969_Project.Database
 
                 throw;
             }
+        }
+
+        /*Appointments*/
+        public static List<AppointmentDisplay> GetAppointments()
+        {
+            if (Conn == null || Conn.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            var appointments = new List<AppointmentDisplay>();
+
+            string sql =
+                @"SELECT a.appointmentId, a.customerId, a.userId, a.title, a.description, a.location, a.contact, a.type, a.url, a.start, a.end, c.customerName, u.userName
+                           FROM appointment AS a
+                           JOIN customer AS c ON c.customerId = a.customerId
+                           JOIN `user` AS u ON u.userId = a.userId
+                           ORDER BY a.start, a.appointmentId;";
+
+            using var cmd = new MySqlCommand(sql, Conn);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                appointments.Add(new AppointmentDisplay
+                {
+                    AppointmentId = reader.GetInt32("appointmentId"),
+                    CustomerName = reader.GetString("customerName"),
+                    UserName = reader.GetString("userName"),
+                    CustomerId = reader.GetInt32("customerId"),
+                    UserId = reader.GetInt32("userId"),
+                    Title = reader.GetString("title"),
+                    Description = reader.GetString("description"),
+                    Location = reader.GetString("location"),
+                    Contact = reader.GetString("contact"),
+                    Type = reader.GetString("type"),
+                    Url = reader.GetString("url"),
+                    Start = DateTime.SpecifyKind(reader.GetDateTime("start"), DateTimeKind.Utc),
+                    End = DateTime.SpecifyKind(reader.GetDateTime("end"), DateTimeKind.Utc),
+                });
+            }
+
+            return appointments;
         }
     }
 }

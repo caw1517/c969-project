@@ -59,4 +59,19 @@ namespace C969_Project.Database
         public string PostalCode { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
     }
+
+    public class Appointment : AuditableModel
+    {
+        public int AppointmentId { get; set; }
+        public int CustomerId { get; set; }
+        public int UserId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string Location { get; set; } = string.Empty;
+        public string Contact { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+    }
 }

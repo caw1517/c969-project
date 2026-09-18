@@ -1,6 +1,7 @@
 using C969_Project.Database;
 using C969_Project.Forms;
 using MySql.Data.MySqlClient;
+using C969_Project.Modules;
 
 namespace C969_Project
 {
@@ -8,15 +9,18 @@ namespace C969_Project
     {
         //private string _connectionString;
         private List<CustomerDisplay>? _customers;
+        private List<AppointmentDisplay>? _appointments;
 
         public MainForm()
         {
             InitializeComponent();
+            appointmentsDataTable.CellFormatting += appointmentsDataTable_CellFormatting;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             LoadCustomers();
+            LoadAppointments();
         }
 
         private void LoadCustomers()
@@ -25,6 +29,34 @@ namespace C969_Project
             customersDataTable.AutoGenerateColumns = false;
             customersDataTable.DataSource = _customers;
             customersDataTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        }
+
+        private void LoadAppointments()
+        {
+            try
+            {
+                _appointments = DatabaseManager.GetAppointments();
+                appointmentsDataTable.AutoGenerateColumns = false;
+                appointmentsDataTable.DataSource = _appointments;
+                appointmentsDataTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+                if (_appointments.Count == 0)
+                {
+                    MessageBox.Show(
+                        "No appointments found.",
+                        "Information",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(
+                    "Appointments could not be loaded. Check your database connection and reopen the application to try again.",
+                    "Load Appointments Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private void editCustomerButton_Click(object sender, EventArgs e)
@@ -127,6 +159,31 @@ namespace C969_Project
         {
             customersDataTable.ClearSelection();
             customersDataTable.CurrentCell = null;
+        }
+
+        private void appointmentsDataTable_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            appointmentsDataTable.ClearSelection();
+            appointmentsDataTable.CurrentCell = null;
+        }
+
+        private void appointmentsDataTable_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            var propertyName = appointmentsDataTable.Columns[e.ColumnIndex].DataPropertyName;
+
+
+            if (propertyName != nameof(Appointment.Start) &&
+                propertyName != nameof(Appointment.End))
+                return;
+
+            if (e.Value is DateTime utcTime)
+            {
+                e.Value = TimeHelper.ToLocal(utcTime).ToString("g");
+                e.FormattingApplied = true;
+            }
         }
     }
 }
