@@ -478,5 +478,109 @@ namespace C969_Project.Database
 
             return appointments;
         }
+
+        public static AppointmentConflict? FindConflict(DateTime startUtc, DateTime endUtc, int? excludeAppointmentId)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            if (startUtc.Kind != DateTimeKind.Utc || endUtc.Kind != DateTimeKind.Utc)
+                throw new ArgumentException("Appointment times must be UTC.");
+
+            const string sql = @"
+        SELECT appointmentId, title, start, end
+        FROM appointment
+        WHERE @startUtc < end
+          AND @endUtc > start
+          AND (@excludeId IS NULL OR appointmentId <> @excludeId)
+        ORDER BY start, appointmentId
+        LIMIT 1";
+
+            using var cmd = new MySqlCommand(sql, connection);
+
+            cmd.Parameters.Add("@startUtc", MySqlDbType.DateTime).Value = startUtc;
+            cmd.Parameters.Add("@endUtc", MySqlDbType.DateTime).Value = endUtc;
+            cmd.Parameters.Add("@excludeId", MySqlDbType.Int32).Value =
+                (object?)excludeAppointmentId ?? DBNull.Value;
+
+            using var reader = cmd.ExecuteReader();
+
+            if (!reader.Read())
+                return null;
+
+            return new AppointmentConflict
+            {
+                AppointmentId = reader.GetInt32("appointmentId"),
+                Title = reader.GetString("title"),
+                Start = DateTime.SpecifyKind(
+                    reader.GetDateTime("start"), DateTimeKind.Utc),
+                End = DateTime.SpecifyKind(
+                    reader.GetDateTime("end"), DateTimeKind.Utc)
+            };
+        }
+
+        public static void AddAppointment(Appointment appointment)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("The database connection is not open.");
+
+            if (Session.CurrentUserId <= 0 ||
+                string.IsNullOrWhiteSpace(Session.CurrentUserName))
+            {
+                throw new InvalidOperationException("A logged-in user is required.");
+            }
+
+            if (appointment.Start.Kind != DateTimeKind.Utc ||
+                appointment.End.Kind != DateTimeKind.Utc)
+            {
+                throw new ArgumentException("Appointment times must be UTC.");
+            }
+
+            const string sql = @"
+        INSERT INTO appointment
+            (customerId, userId, title, description, location,
+             contact, type, url, start, end,
+             createDate, createdBy, lastUpdateBy)
+        VALUES
+            (@customerId, @userId, @title, @description, @location,
+             @contact, @type, @url, @start, @end,
+             @createDate, @createdBy, @lastUpdateBy)";
+
+            using var cmd = new MySqlCommand(sql, connection);
+
+            cmd.Parameters.Add("@customerId", MySqlDbType.Int32).Value =
+                appointment.CustomerId;
+            cmd.Parameters.Add("@userId", MySqlDbType.Int32).Value =
+                Session.CurrentUserId;
+            cmd.Parameters.Add("@title", MySqlDbType.VarChar).Value =
+                (appointment.Title ?? string.Empty).Trim();
+            cmd.Parameters.Add("@description", MySqlDbType.Text).Value =
+                (appointment.Description ?? string.Empty).Trim();
+            cmd.Parameters.Add("@location", MySqlDbType.Text).Value =
+                (appointment.Location ?? string.Empty).Trim();
+            cmd.Parameters.Add("@contact", MySqlDbType.Text).Value =
+                (appointment.Contact ?? string.Empty).Trim();
+            cmd.Parameters.Add("@type", MySqlDbType.Text).Value =
+                (appointment.Type ?? string.Empty).Trim();
+            cmd.Parameters.Add("@url", MySqlDbType.VarChar).Value =
+                (appointment.Url ?? string.Empty).Trim();
+            cmd.Parameters.Add("@start", MySqlDbType.DateTime).Value =
+                appointment.Start;
+            cmd.Parameters.Add("@end", MySqlDbType.DateTime).Value =
+                appointment.End;
+            cmd.Parameters.Add("@createDate", MySqlDbType.DateTime).Value =
+                DateTime.UtcNow;
+            cmd.Parameters.Add("@createdBy", MySqlDbType.VarChar).Value =
+                Session.CurrentUserName;
+            cmd.Parameters.Add("@lastUpdateBy", MySqlDbType.VarChar).Value =
+                Session.CurrentUserName;
+
+            if (cmd.ExecuteNonQuery() != 1)
+                throw new InvalidOperationException("The appointment was not added.");
+        }
     }
 }

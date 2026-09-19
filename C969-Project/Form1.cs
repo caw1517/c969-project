@@ -14,6 +14,7 @@ namespace C969_Project
         public MainForm()
         {
             InitializeComponent();
+            addAppointmentButton.Click += addAppointmentButton_Click;
             appointmentsDataTable.CellFormatting += appointmentsDataTable_CellFormatting;
         }
 
@@ -31,7 +32,17 @@ namespace C969_Project
             customersDataTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void LoadAppointments()
+        private void addAppointmentButton_Click(object? sender, EventArgs e)
+        {
+            using var appointmentForm = new AppointmentForm();
+
+            if (appointmentForm.ShowDialog(this) == DialogResult.OK)
+            {
+                LoadAppointments(afterSave: true);
+            }
+        }
+
+        private void LoadAppointments(bool afterSave = false)
         {
             try
             {
@@ -40,9 +51,13 @@ namespace C969_Project
                 appointmentsDataTable.DataSource = _appointments;
                 appointmentsDataTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
+                appointmentTimeZoneLabel.Text =
+                    $"Time zone: {TimeZoneInfo.Local.DisplayName}";
+
                 if (_appointments.Count == 0)
                 {
                     MessageBox.Show(
+                        this,
                         "No appointments found.",
                         "Information",
                         MessageBoxButtons.OK,
@@ -51,9 +66,20 @@ namespace C969_Project
             }
             catch (Exception)
             {
+                var message = afterSave
+                    ? "The appointment was saved, but the list could not be refreshed. " +
+                      "Reopen the application to reload the list. Do not add the appointment again."
+                    : "Appointments could not be loaded. " +
+                      "Check your database connection and reopen the application to try again.";
+
+                var title = afterSave
+                    ? "Appointment Saved — Refresh Failed"
+                    : "Load Appointments Failed";
+
                 MessageBox.Show(
-                    "Appointments could not be loaded. Check your database connection and reopen the application to try again.",
-                    "Load Appointments Failed",
+                    this,
+                    message,
+                    title,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
