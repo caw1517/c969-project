@@ -46,20 +46,39 @@ verified the valid `test`/`test` case plus invalid and inactive-user rejection. 
 
 ## A2 — Customer Records
 
-- [ ] **A2** — Add, update, and delete customer records in the database, functioning properly
-- [ ] **A2a** — Validation, all three required:
-    - [ ] Record includes name, address, and phone number fields
-    - [ ] Fields are trimmed and non-empty
-    - [ ] Phone number field allows only digits and dashes
-- [ ] **A2b** — Exception handling working for all three operations:
-    - [ ] add
-    - [ ] update
-    - [ ] delete database
+- [x] **A2** — Add, update, and delete customer records in the database, functioning properly
+- [x] **A2a** — Validation, all three required:
+    - [x] Record includes name, address, and phone number fields
+    - [x] Fields are trimmed and non-empty
+    - [x] Phone number field allows only digits and dashes
+- [x] **A2b** — Exception handling working for all three operations:
+    - [x] add
+    - [x] update
+    - [x] delete database
 
-**Evidence:** Not implemented. `CustomerForm.saveEditCustomerButton_Click` has empty Add/Edit
-branches, `deleteCustomerButton` has no handler, and the validation only checks blankness. It does
-not trim fields, enforce digits-and-dashes-only phone input, write to the database, refresh the
-grid, or handle add/update/delete exceptions.
+**Evidence (2026-09-20):** `CustomerForm.TrimInput` and `ValidateCustomerInput` normalize text,
+require name/primary address/phone/postal code and country/city selections, enforce schema lengths,
+and restrict phone values to ASCII digits and dashes. Invalid input returns before persistence.
+Country and city selectors use stable IDs, with city choices filtered by country.
+`DatabaseManager.AddCustomer` inserts a fresh address and its customer in one parameterized
+transaction. `EditCustomer` updates the existing customer/address pair in a transaction while
+preserving creation audit fields. Both use the current session for audit names; inserts use UTC
+creation time, and neither operation writes the database-maintained `lastUpdate`.
+`CustomerForm.saveEditCustomerButton_Click` has separate Add/Edit exception paths and returns OK
+after successful persistence. `MainForm` refreshes the customer grid after successful operations.
+`MainForm.deleteCustomerButton_Click` requires selection and confirmation, calls transactional
+`DatabaseManager.DeleteCustomer`, and handles foreign-key error 1451 with instructions to delete
+the customer's appointments first. Successful deletion removes the customer then its address;
+appointments and shared city/country records are preserved. Other failures have Delete-specific
+messaging, and Edit/Delete refresh failures are distinguished from write failures.
+
+Customer work is tracked in closed issues [#7](https://github.com/caw1517/c969-project/issues/7),
+[#27](https://github.com/caw1517/c969-project/issues/27),
+[#28](https://github.com/caw1517/c969-project/issues/28), and
+[#29](https://github.com/caw1517/c969-project/issues/29). On 2026-09-20, the user explicitly confirmed
+that all Customer Add/Edit/Delete, validation, and controlled failure/rollback checks passed.
+This confirmation resolves the older issue notes that left runtime verification pending.
+Runtime verification is user-reported, not independently executed by the reviewing agent.
 
 ## A3 — Appointments
 
@@ -93,22 +112,51 @@ checks were user-reported. This completes A3 and A3b; the changes are awaiting t
 
 ## A4 — Calendar View
 
-- [ ] **A4** — View the calendar **by month**, and view appointments on a **specific day** by selecting a day from that calendar
+- [x] **A4** — View the calendar **by month**, and view appointments on a **specific day** by selecting a day from that calendar
 
 > Note: the rubric asks for month view + select-a-day. It does *not* require a separate week view.
 
-**Evidence:** Not implemented. The Calendar tab is an empty placeholder; no month calendar,
-appointment display, or day-selection filter exists.
+**Evidence (2026-09-20):** Month view is implemented in `MainForm.ConfigureCalendarLayout`,
+`ConfigureCalendarBehavior`, `RefreshCalendarView`, and `calendarDataTable_CellFormatting`
+for [#35](https://github.com/caw1517/c969-project/issues/35). The view filters a separate list
+by local start year/month, preserves UTC models and the full appointment collection, orders by
+UTC start then appointment ID, and displays local timestamps with month and time-zone labels.
+`LoadAppointments` refreshes the calendar after successful loads and CRUD and marks failed loads
+unavailable while preserving operation-specific errors and the selected date.
+Standards and specification reviews found no actionable defects. A fresh rebuild to a temporary
+output directory passed with 0 errors and 14 existing warnings; normal output was locked by the
+running application/debugger. The user reported passing startup, month/year navigation, empty
+months, CRUD including moving an appointment outside the month, full-list preservation, minimum
+1100 x 600 layout, UTC/local boundaries, DST display, and failed-load recovery checks.
+The user confirmed Pacific (`Pacific Standard Time`) as the test zone and restoration of any
+temporary machine-zone change. Runtime checks were user-reported, not agent-executed.
+Selected-day filtering and Show whole month are also implemented and verified for
+[#36](https://github.com/caw1517/c969-project/issues/36), completing A4 and parent
+[#12](https://github.com/caw1517/c969-project/issues/12). `_calendarDayMode` selects local-start
+date equality or year/month membership. `DateChanged` and `DateSelected` enter day mode;
+`showWholeMonthButton_Click` restores month mode. The native calendar is initialized before
+subscribing to selection events. Date and mode survive tab changes and appointment reloads.
+The user reported all requested runtime checks passed: populated/empty days, selecting the
+highlighted day, month restoration, keyboard/month/year navigation, minimum-size layout,
+Add/Edit/Delete including movement into/out of the selected day, full-list preservation,
+UTC/local date differences, local-midnight crossing, DST display, and reload failure/recovery.
+The user reported the verification zone as PST (Pacific) and confirmed temporary zone changes
+were restored. These runtime checks were user-reported, not independently agent-executed.
+The final rebuild passed with 0 errors and 14 existing warnings; whitespace checks passed.
+Changes remain uncommitted for the user to commit.
 
 ## A5 — Time Zones
 
-- [ ] **A5** — Appointment times automatically adjust based on user time zone **and daylight saving time**
+- [x] **A5** — Appointment times automatically adjust based on user time zone **and daylight saving time**
 
 **Evidence (2026-09-20):** `TimeHelper` converts machine-local form input to UTC and UTC to local
 for grid/editor display; Eastern conversion is used only for validation. Add/Edit persist UTC
 and the reader assigns `DateTimeKind.Utc`. The user reported the Edit checks complete, including
-the local-time round trip. A dedicated DST verification record remains needed before checking
-the complete A5 requirement.
+the local-time round trip. The completion record in [#31](https://github.com/caw1517/c969-project/issues/31)
+confirms local display against stored UTC and DST checks for October 30 and November 2, 2026,
+accounting for the machine's time zone. Runtime verification was user-reported, not independently
+executed by the reviewing agents. The parent #11 review found no functional gaps in appointment
+CRUD or time conversion; the project build passed. A3, A3a, A3b, and A5 are complete.
 
 ## A6 — Alerts
 
