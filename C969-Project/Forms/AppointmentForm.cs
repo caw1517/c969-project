@@ -5,6 +5,10 @@ namespace C969_Project.Forms;
 
 public partial class AppointmentForm : Form
 {
+    private readonly int? _appointmentId;
+    private readonly int _originalUserId;
+    private readonly int? _originalCustomerId;
+
     public AppointmentForm()
     {
         InitializeComponent();
@@ -31,6 +35,26 @@ public partial class AppointmentForm : Form
         saveButton.Click += SaveButton_Click;
     }
 
+    public AppointmentForm(AppointmentDisplay appointment) : this()
+    {
+        _appointmentId = appointment.AppointmentId;
+        _originalUserId = appointment.UserId;
+
+        Text = "Edit Appointment";
+        typeTextBox.Text = appointment.Type;
+        titleTextBox.Text = appointment.Title;
+        descriptionTextBox.Text = appointment.Description;
+        locationTextBox.Text = appointment.Location;
+        contactTextBox.Text = appointment.Contact;
+        urlTextBox.Text = appointment.Url;
+        startDateTimePicker.Value =
+            AtMinutePrecision(TimeHelper.ToLocal(appointment.Start));
+        endDateTimePicker.Value =
+            AtMinutePrecision(TimeHelper.ToLocal(appointment.End));
+
+        _originalCustomerId = appointment.CustomerId;
+    }
+
     private void AppointmentForm_Load(object? sender, EventArgs e)
     {
         try
@@ -41,10 +65,13 @@ public partial class AppointmentForm : Form
             customerComboBox.DataSource = customers;
             customerComboBox.SelectedIndex = -1;
 
+            if (_originalCustomerId.HasValue)
+                customerComboBox.SelectedValue = _originalCustomerId.Value;
+
             if (customers.Count == 0)
             {
                 saveButton.Enabled = false;
-                MessageBox.Show(this, "Add a customer before creating an appointment.",
+                MessageBox.Show(this, "A customer is required to save an appointment.",
                     "No Customers", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
@@ -120,8 +147,11 @@ public partial class AppointmentForm : Form
 
         var appointment = new Appointment
         {
+            AppointmentId = _appointmentId ?? 0,
             CustomerId = customerId,
-            UserId = Session.CurrentUserId,
+            UserId = _appointmentId.HasValue
+                ? _originalUserId
+                : Session.CurrentUserId,
             Type = typeTextBox.Text,
             Title = titleTextBox.Text,
             Description = descriptionTextBox.Text,
@@ -132,32 +162,46 @@ public partial class AppointmentForm : Form
             End = endUtc
         };
 
-        try
+        if (_appointmentId.HasValue)
         {
-            var conflict = DatabaseManager.FindConflict(startUtc, endUtc, null);
-
-            if (conflict != null)
+            try
             {
-                var conflictName = string.IsNullOrWhiteSpace(conflict.Title)
-                    ? $"Appointment {conflict.AppointmentId}"
-                    : conflict.Title;
-                var conflictStart = TimeHelper.ToLocal(conflict.Start);
-                var conflictEnd = TimeHelper.ToLocal(conflict.End);
-                ShowValidationError(
-                    $"This time overlaps with \"{conflictName}\" " +
-                    $"({conflictStart:g} to {conflictEnd:g}, local time).");
+                if (HasConflict(appointment))
+                    return;
+
+                DatabaseManager.EditAppointment(appointment);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(this,
+                    "Unable to complete the appointment edit. " +
+                    "Check the database connection and whether the appointment still exists. " +
+                    "If the connection was interrupted during saving, " +
+                    "check the appointment list before retrying.",
+                    "Edit Appointment Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
-            DatabaseManager.AddAppointment(appointment);
         }
-        catch (Exception)
+        else
         {
-            MessageBox.Show(this,
-                "Unable to complete the appointment save. Check the database connection. " +
-                "If the connection was interrupted during saving, check the appointment list before retrying.",
-                "Add Appointment Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
+            try
+            {
+                if (HasConflict(appointment))
+                    return;
+
+                DatabaseManager.AddAppointment(appointment);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(this,
+                    "Unable to complete the appointment save. Check the database connection. " +
+                    "If the connection was interrupted during saving, " +
+                    "check the appointment list before retrying.",
+                    "Add Appointment Failed",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
         }
 
         DialogResult = DialogResult.OK;
@@ -188,5 +232,26 @@ public partial class AppointmentForm : Form
     {
         MessageBox.Show(this, message, "Check Appointment",
             MessageBoxButtons.OK, MessageBoxIcon.Warning);
+    }
+
+    private bool HasConflict(Appointment appointment)
+    {
+        var conflict = DatabaseManager.FindConflict(
+            appointment.Start, appointment.End, _appointmentId);
+
+        if (conflict == null)
+            return false;
+
+        var conflictName = string.IsNullOrWhiteSpace(conflict.Title)
+            ? $"Appointment {conflict.AppointmentId}"
+            : conflict.Title;
+        var conflictStart = TimeHelper.ToLocal(conflict.Start);
+        var conflictEnd = TimeHelper.ToLocal(conflict.End);
+
+        ShowValidationError(
+            $"This time overlaps with \"{conflictName}\" " +
+            $"({conflictStart:g} to {conflictEnd:g}, local time).");
+
+        return true;
     }
 }

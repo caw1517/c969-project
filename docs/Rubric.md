@@ -64,17 +64,24 @@ grid, or handle add/update/delete exceptions.
 ## A3 — Appointments
 
 - [ ] **A3** — Add, update, delete appointments; capture appointment type; link to a specific customer record
-- [ ] **A3a** — Validation, both required:
-    - [ ] Appointments only during business hours 9:00 a.m.–5:00 p.m., Mon–Fri, **eastern standard time**
-    - [ ] Overlapping appointments prevented
+- [x] **A3a** — Validation, both required:
+    - [x] Appointments only during business hours 9:00 a.m.–5:00 p.m., Mon–Fri, **eastern standard time**
+    - [x] Overlapping appointments prevented
 - [ ] **A3b** — Exception handling working for all three operations:
-    - [ ] add
-    - [ ] update
+    - [x] add
+    - [x] update
     - [ ] delete database
 
-**Evidence:** Not implemented. There is no appointment model, CRUD query, appointment form, type
-capture, customer link, business-hours validation, overlap check, or operation-specific exception
-handling. The Appointments tab is an empty placeholder.
+**Evidence (2026-09-20):** Add (#32) and Edit (#33) are implemented in `AppointmentForm`,
+`DatabaseManager`, and `MainForm`. Both capture Type and Customer, validate local inputs against
+the same Eastern business date and 09:00–17:00 weekday window, and check global overlap.
+Edit excludes its own ID, preserves ownership and creation audit fields, and checks row existence
+inside a transaction so unchanged saves succeed while missing rows fail. Separate Add/Edit
+exception paths include overlap lookup failures; Cancel writes nothing. The six explicit grid
+columns display local times, and refresh failures are distinguished from successful saves.
+Add runtime evidence is recorded in #32; the user reported all Edit tests complete on 2026-09-20.
+Runtime verification was user-reported, not independently executed by the reviewing agents.
+Delete remains outstanding, so the overall A3 and A3b boxes remain open.
 
 ## A4 — Calendar View
 
@@ -89,8 +96,11 @@ appointment display, or day-selection filter exists.
 
 - [ ] **A5** — Appointment times automatically adjust based on user time zone **and daylight saving time**
 
-**Evidence:** Not implemented. No UTC/local/eastern conversion helper or appointment read/write
-path exists, so daylight-saving adjustment cannot currently occur.
+**Evidence (2026-09-20):** `TimeHelper` converts machine-local form input to UTC and UTC to local
+for grid/editor display; Eastern conversion is used only for validation. Add/Edit persist UTC
+and the reader assigns `DateTimeKind.Utc`. The user reported the Edit checks complete, including
+the local-time round trip. A dedicated DST verification record remains needed before checking
+the complete A5 requirement.
 
 ## A6 — Alerts
 

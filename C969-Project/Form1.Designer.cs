@@ -52,12 +52,6 @@
             maskedTextBox1 = new System.Windows.Forms.MaskedTextBox();
             appointmentsPage = new System.Windows.Forms.TabPage();
             appointmentsDataTable = new System.Windows.Forms.DataGridView();
-            appointmentCustomer = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            appointmentUser = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            appointmentType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            appointmentTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            appointmentStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            appointmentEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             appointmentButtonLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             addAppointmentButton = new System.Windows.Forms.Button();
             editAppointmentButton = new System.Windows.Forms.Button();
@@ -308,41 +302,6 @@
             // appointmentsDataTable
             // 
             appointmentsDataTable.AllowUserToAddRows = false;
-            appointmentCustomer.Name = "appointmentCustomer";
-            appointmentCustomer.HeaderText = "Customer";
-            appointmentCustomer.DataPropertyName = "CustomerName";
-
-            appointmentUser.Name = "appointmentUser";
-            appointmentUser.HeaderText = "User";
-            appointmentUser.DataPropertyName = "UserName";
-
-            appointmentType.Name = "appointmentType";
-            appointmentType.HeaderText = "Type";
-            appointmentType.DataPropertyName = "Type";
-
-            appointmentTitle.Name = "appointmentTitle";
-            appointmentTitle.HeaderText = "Title";
-            appointmentTitle.DataPropertyName = "Title";
-
-            appointmentStart.Name = "appointmentStart";
-            appointmentStart.HeaderText = "Start";
-            appointmentStart.DataPropertyName = "Start";
-
-            appointmentEnd.Name = "appointmentEnd";
-            appointmentEnd.HeaderText = "End";
-            appointmentEnd.DataPropertyName = "End";
-
-            appointmentsDataTable.AutoGenerateColumns = false;
-            appointmentsDataTable.Columns.AddRange(
-                new System.Windows.Forms.DataGridViewColumn[]
-                {
-                    appointmentCustomer,
-                    appointmentUser,
-                    appointmentType,
-                    appointmentTitle,
-                    appointmentStart,
-                    appointmentEnd
-                });
             appointmentsDataTable.AllowUserToDeleteRows = false;
             appointmentsDataTable.AllowUserToResizeRows = false;
             appointmentsDataTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
@@ -394,6 +353,7 @@
             editAppointmentButton.TabIndex = 1;
             editAppointmentButton.Text = "Edit";
             editAppointmentButton.UseVisualStyleBackColor = true;
+            editAppointmentButton.Click += editAppointmentButton_Click;
             // 
             // deleteAppointmentButton
             // 

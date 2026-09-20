@@ -14,6 +14,7 @@ namespace C969_Project
         public MainForm()
         {
             InitializeComponent();
+            ConfigureAppointmentColumns();
             addAppointmentButton.Click += addAppointmentButton_Click;
             appointmentsDataTable.CellFormatting += appointmentsDataTable_CellFormatting;
         }
@@ -68,7 +69,7 @@ namespace C969_Project
             {
                 var message = afterSave
                     ? "The appointment was saved, but the list could not be refreshed. " +
-                      "Reopen the application to reload the list. Do not add the appointment again."
+                      "Reopen the application to reload the list before making further changes."
                     : "Appointments could not be loaded. " +
                       "Check your database connection and reopen the application to try again.";
 
@@ -83,6 +84,50 @@ namespace C969_Project
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
+        }
+        
+        private void ConfigureAppointmentColumns()
+        {
+            appointmentsDataTable.AutoGenerateColumns = false;
+            appointmentsDataTable.Columns.Clear();
+
+            appointmentsDataTable.Columns.AddRange(
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentCustomer",
+                    HeaderText = "Customer",
+                    DataPropertyName = nameof(AppointmentDisplay.CustomerName)
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentUser",
+                    HeaderText = "User",
+                    DataPropertyName = nameof(AppointmentDisplay.UserName)
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentType",
+                    HeaderText = "Type",
+                    DataPropertyName = nameof(AppointmentDisplay.Type)
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentTitle",
+                    HeaderText = "Title",
+                    DataPropertyName = nameof(AppointmentDisplay.Title)
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentStart",
+                    HeaderText = "Start",
+                    DataPropertyName = nameof(AppointmentDisplay.Start)
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    Name = "appointmentEnd",
+                    HeaderText = "End",
+                    DataPropertyName = nameof(AppointmentDisplay.End)
+                });
         }
 
         private void editCustomerButton_Click(object sender, EventArgs e)
@@ -209,6 +254,27 @@ namespace C969_Project
             {
                 e.Value = TimeHelper.ToLocal(utcTime).ToString("g");
                 e.FormattingApplied = true;
+            }
+        }
+
+        private void editAppointmentButton_Click(object sender, EventArgs e)
+        {
+            if (appointmentsDataTable.SelectedRows.Count == 0 ||
+                appointmentsDataTable.SelectedRows[0].DataBoundItem is not AppointmentDisplay selectedAppointment)
+            {
+                MessageBox.Show(this,
+                    "Select an appointment to edit.",
+                    "Select Appointment",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                return;
+            }
+            
+            using var appointmentForm = new AppointmentForm(selectedAppointment);
+
+            if (appointmentForm.ShowDialog(this) == DialogResult.OK)
+            {
+                LoadAppointments(afterSave: true);
             }
         }
     }
