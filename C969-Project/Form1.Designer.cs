@@ -364,6 +364,7 @@
             deleteAppointmentButton.TabIndex = 2;
             deleteAppointmentButton.Text = "Delete";
             deleteAppointmentButton.UseVisualStyleBackColor = true;
+            deleteAppointmentButton.Click += deleteAppointmentButton_Click;
             // 
             // appointmentSelectionLabel
             // 

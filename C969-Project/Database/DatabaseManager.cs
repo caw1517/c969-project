@@ -655,5 +655,22 @@ namespace C969_Project.Database
                 throw;
             }
         }
+
+        public static void DeleteAppointment(int appointmentId)
+        {
+            var connection = Conn;
+
+            if (connection == null || connection.State != ConnectionState.Open)
+                throw new InvalidOperationException("Database connection is not open.");
+
+            const string sql = @"DELETE FROM appointment WHERE appointmentId = @appointmentId";
+
+            using var cmd = new MySqlCommand(sql, connection);
+
+            cmd.Parameters.Add("@appointmentId", MySqlDbType.Int32).Value = appointmentId;
+
+            if (cmd.ExecuteNonQuery() == 0)
+                throw new InvalidOperationException("The appointment no longer exists. Reload the appointment list.");
+        }
     }
 }

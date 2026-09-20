@@ -43,7 +43,7 @@ namespace C969_Project
             }
         }
 
-        private void LoadAppointments(bool afterSave = false)
+        private void LoadAppointments(bool afterSave = false, bool afterDelete = false)
         {
             try
             {
@@ -67,15 +67,20 @@ namespace C969_Project
             }
             catch (Exception)
             {
-                var message = afterSave
-                    ? "The appointment was saved, but the list could not be refreshed. " +
+                var message = afterDelete
+                    ? "The appointment was deleted, but the list could not be refreshed. " +
                       "Reopen the application to reload the list before making further changes."
-                    : "Appointments could not be loaded. " +
-                      "Check your database connection and reopen the application to try again.";
+                    : afterSave
+                        ? "The appointment was saved, but the list could not be refreshed. " +
+                          "Reopen the application to reload the list before making further changes."
+                        : "Appointments could not be loaded. " +
+                          "Check your database connection and reopen the application to try again.";
+                var title = afterDelete
+                    ? "Appointment Deleted — Refresh Failed"
+                    : afterSave
+                        ? "Appointment Saved — Refresh Failed"
+                        : "Load Appointments Failed";
 
-                var title = afterSave
-                    ? "Appointment Saved — Refresh Failed"
-                    : "Load Appointments Failed";
 
                 MessageBox.Show(
                     this,
@@ -85,7 +90,7 @@ namespace C969_Project
                     MessageBoxIcon.Error);
             }
         }
-        
+
         private void ConfigureAppointmentColumns()
         {
             appointmentsDataTable.AutoGenerateColumns = false;
@@ -266,16 +271,75 @@ namespace C969_Project
                     "Select an appointment to edit.",
                     "Select Appointment",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
+
                 return;
             }
-            
+
             using var appointmentForm = new AppointmentForm(selectedAppointment);
 
             if (appointmentForm.ShowDialog(this) == DialogResult.OK)
             {
                 LoadAppointments(afterSave: true);
             }
+        }
+
+        private void deleteAppointmentButton_Click(object sender, EventArgs e)
+        {
+            if (appointmentsDataTable.SelectedRows.Count == 0 ||
+                appointmentsDataTable.SelectedRows[0].DataBoundItem
+                    is not AppointmentDisplay selectedAppointment)
+            {
+                MessageBox.Show(
+                    this,
+                    "Select an appointment to delete.",
+                    "Select Appointment",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            var appointmentName = string.IsNullOrWhiteSpace(selectedAppointment.Title)
+                ? $"Appointment {selectedAppointment.AppointmentId}"
+                : selectedAppointment.Title;
+
+            var confirmation = MessageBox.Show(
+                this,
+                $"Delete '{appointmentName}' for {selectedAppointment.CustomerName}?",
+                "Delete Appointment",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning,
+                MessageBoxDefaultButton.Button2);
+
+            if (confirmation != DialogResult.Yes)
+                return;
+
+            try
+            {
+                DatabaseManager.DeleteAppointment(selectedAppointment.AppointmentId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(
+                    this,
+                    ex.Message,
+                    "Delete Appointment Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                return;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(
+                    this,
+                    "The appointment could not be deleted. " +
+                    "Check your database connection and reload the list before trying again.",
+                    "Delete Appointment Failed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            LoadAppointments(afterDelete: true);
         }
     }
 }

@@ -63,14 +63,14 @@ grid, or handle add/update/delete exceptions.
 
 ## A3 — Appointments
 
-- [ ] **A3** — Add, update, delete appointments; capture appointment type; link to a specific customer record
+- [x] **A3** — Add, update, delete appointments; capture appointment type; link to a specific customer record
 - [x] **A3a** — Validation, both required:
     - [x] Appointments only during business hours 9:00 a.m.–5:00 p.m., Mon–Fri, **eastern standard time**
     - [x] Overlapping appointments prevented
-- [ ] **A3b** — Exception handling working for all three operations:
+- [x] **A3b** — Exception handling working for all three operations:
     - [x] add
     - [x] update
-    - [ ] delete database
+    - [x] delete database
 
 **Evidence (2026-09-20):** Add (#32) and Edit (#33) are implemented in `AppointmentForm`,
 `DatabaseManager`, and `MainForm`. Both capture Type and Customer, validate local inputs against
@@ -81,7 +81,15 @@ exception paths include overlap lookup failures; Cancel writes nothing. The six 
 columns display local times, and refresh failures are distinguished from successful saves.
 Add runtime evidence is recorded in #32; the user reported all Edit tests complete on 2026-09-20.
 Runtime verification was user-reported, not independently executed by the reviewing agents.
-Delete remains outstanding, so the overall A3 and A3b boxes remain open.
+Delete (#34) is implemented in `DatabaseManager.DeleteAppointment` and
+`MainForm.deleteAppointmentButton_Click`, with one Designer event subscription. It requires
+selection and Yes/No confirmation (default No), deletes by a typed appointment ID parameter,
+reports missing rows, and separates Delete failures from successful deletion followed by a
+refresh failure. On 2026-09-20 the user confirmed all requested runtime checks passed: no selection,
+declined deletion, confirmed deletion and refresh, preservation of Customer/User/other appointments,
+missing-row handling, controlled Delete failure, and controlled refresh failure after deletion.
+The reviewing agent verified the code and build: 0 errors and 14 existing warnings. Runtime
+checks were user-reported. This completes A3 and A3b; the changes are awaiting the user's commit.
 
 ## A4 — Calendar View
 
