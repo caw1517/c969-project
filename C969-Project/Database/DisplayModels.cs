@@ -4,6 +4,12 @@ using System.Text;
 
 namespace C969_Project.Database
 {
+    public class AppointmentDisplay : Appointment
+    {
+        public string CustomerName { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+    }
+
     public class CustomerDisplay
     {
         public int CustomerId { get; set; }
