@@ -18,6 +18,8 @@ namespace C969_Project
         private readonly Label calendarTimeZoneLabel = new();
         private readonly Label calendarStatusLabel = new();
         private readonly Button showWholeMonthButton = new();
+        private readonly DataGridView typesByMonthDataTable = new();
+        private readonly Label typesByMonthStatusLabel = new();
 
         public MainForm()
         {
@@ -25,9 +27,158 @@ namespace C969_Project
             ConfigureAppointmentColumns();
             ConfigureCalendarLayout();
             ConfigureCalendarBehavior();
+            ConfigureReportsLayout();
 
             addAppointmentButton.Click += addAppointmentButton_Click;
             appointmentsDataTable.CellFormatting += appointmentsDataTable_CellFormatting;
+        }
+
+        private void RefreshReports()
+        {
+            RefreshTypesByMonthReport();
+        }
+
+        private void RefreshTypesByMonthReport()
+        {
+            if (!_appointmentDataAvailable || _appointments is null)
+            {
+                typesByMonthDataTable.DataSource =
+                    new List<AppointmentTypeCountRow>();
+                typesByMonthStatusLabel.Text = "Appointment data unavailable.";
+                return;
+            }
+
+            var rows = _appointments
+                .GroupBy(appointment =>
+                {
+                    var localStart = TimeHelper.ToLocal(appointment.Start);
+
+                    return new
+                    {
+                        Year = localStart.Year,
+                        Month = localStart.Month,
+                        appointment.Type
+                    };
+                })
+                .Select(group => new AppointmentTypeCountRow
+                {
+                    Year = group.Key.Year,
+                    Month = group.Key.Month,
+                    Type = group.Key.Type,
+                    Count = group.Count()
+                })
+                .OrderBy(row => row.Year)
+                .ThenBy(row => row.Month)
+                .ThenBy(row => row.Type)
+                .ToList();
+
+            typesByMonthDataTable.DataSource = rows;
+            typesByMonthDataTable.ClearSelection();
+            typesByMonthDataTable.CurrentCell = null;
+
+            typesByMonthStatusLabel.Text = rows.Count == 0
+                ? "No appointments found."
+                : $"Appointment counts by local start month. " +
+                  $"Time zone: {TimeZoneInfo.Local.DisplayName}";
+        }
+
+        private void ConfigureReportsLayout()
+        {
+            reportsPage.Padding = new Padding(8);
+
+            var reportTabs = new TabControl
+            {
+                Name = "reportTabs",
+                Dock = DockStyle.Fill
+            };
+
+            var typesByMonthPage = new TabPage("Types by Month")
+            {
+                Name = "typesByMonthPage",
+                Padding = new Padding(8),
+                UseVisualStyleBackColor = true
+            };
+
+            var userSchedulesPage = new TabPage("User Schedules")
+            {
+                Name = "userSchedulesPage",
+                UseVisualStyleBackColor = true
+            };
+
+            var appointmentsByCustomerPage =
+                new TabPage("Appointments by Customer")
+                {
+                    Name = "appointmentsByCustomerPage",
+                    UseVisualStyleBackColor = true
+                };
+
+            var layout = new TableLayoutPanel
+            {
+                Name = "typesByMonthLayout",
+                Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = 2,
+                Margin = new Padding(0)
+            };
+
+            layout.ColumnStyles.Add(
+                new ColumnStyle(SizeType.Percent, 100F));
+            layout.RowStyles.Add(
+                new RowStyle(SizeType.AutoSize));
+            layout.RowStyles.Add(
+                new RowStyle(SizeType.Percent, 100F));
+
+            typesByMonthStatusLabel.Name = "typesByMonthStatusLabel";
+            typesByMonthStatusLabel.AutoSize = true;
+            typesByMonthStatusLabel.Text = "Appointment data unavailable.";
+            typesByMonthStatusLabel.Margin = new Padding(0, 0, 0, 8);
+
+            typesByMonthDataTable.Name = "typesByMonthDataTable";
+            typesByMonthDataTable.Dock = DockStyle.Fill;
+            typesByMonthDataTable.Margin = new Padding(0);
+            typesByMonthDataTable.ReadOnly = true;
+            typesByMonthDataTable.AutoGenerateColumns = false;
+            typesByMonthDataTable.AllowUserToAddRows = false;
+            typesByMonthDataTable.AllowUserToDeleteRows = false;
+            typesByMonthDataTable.AllowUserToResizeRows = false;
+            typesByMonthDataTable.RowHeadersVisible = false;
+            typesByMonthDataTable.MultiSelect = false;
+            typesByMonthDataTable.SelectionMode =
+                DataGridViewSelectionMode.FullRowSelect;
+            typesByMonthDataTable.AutoSizeColumnsMode =
+                DataGridViewAutoSizeColumnsMode.Fill;
+            typesByMonthDataTable.ColumnHeadersHeightSizeMode =
+                DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            typesByMonthDataTable.BackgroundColor = SystemColors.Window;
+
+            var columns = new[]
+            {
+                (Header: "Year", Property: nameof(AppointmentTypeCountRow.Year)),
+                (Header: "Month", Property: nameof(AppointmentTypeCountRow.Month)),
+                (Header: "Type", Property: nameof(AppointmentTypeCountRow.Type)),
+                (Header: "Count", Property: nameof(AppointmentTypeCountRow.Count))
+            };
+
+            foreach (var column in columns)
+            {
+                typesByMonthDataTable.Columns.Add(
+                    new DataGridViewTextBoxColumn
+                    {
+                        Name = $"typesByMonth{column.Header}",
+                        HeaderText = column.Header,
+                        DataPropertyName = column.Property,
+                        SortMode = DataGridViewColumnSortMode.NotSortable
+                    });
+            }
+
+            layout.Controls.Add(typesByMonthStatusLabel, 0, 0);
+            layout.Controls.Add(typesByMonthDataTable, 0, 1);
+            typesByMonthPage.Controls.Add(layout);
+
+            reportTabs.TabPages.Add(typesByMonthPage);
+            reportTabs.TabPages.Add(userSchedulesPage);
+            reportTabs.TabPages.Add(appointmentsByCustomerPage);
+            reportsPage.Controls.Add(reportTabs);
         }
 
         private void ConfigureCalendarLayout()
@@ -300,6 +451,7 @@ namespace C969_Project
 
                 _appointmentDataAvailable = true;
                 RefreshCalendarView();
+                RefreshReports();
 
                 if (_appointments.Count == 0)
                 {
@@ -315,6 +467,7 @@ namespace C969_Project
             {
                 _appointmentDataAvailable = false;
                 RefreshCalendarView();
+                RefreshReports();
 
                 var message = afterDelete
                     ? "The appointment was deleted, but the list could not be refreshed. " +

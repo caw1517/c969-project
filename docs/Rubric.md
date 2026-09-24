@@ -170,15 +170,36 @@ display a 15-minute alert.
 Must use **collection classes**, and **each of the three reports needs its own lambda expression**.
 The rubric explicitly fails this if "less than 3 of the reports incorporate a lambda expression."
 
-- [ ] Number of appointment types by month
+- [x] Number of appointment types by month
 - [ ] Schedule for each **user**
-- [ ] One additional report of your choice — write down which one:
+- [ ] One additional report of your choice — Appointment Count by Customer
 - [ ] All three use collection classes
 - [ ] All three each contain a lambda expression
 
-**Evidence:** Not implemented. The Reports tab is an empty placeholder; none of the three required
-reports, collection-based processing, or three separate lambdas exists. The additional report has
-not yet been selected.
+**Evidence (2026-09-24):** Types by Month is implemented for
+[#38](https://github.com/caw1517/c969-project/issues/38). `MainForm.ConfigureReportsLayout`
+creates the three Reports sub-tabs and an explicit read-only Year/Month/Type/Count grid with
+automatic columns and user row creation/deletion disabled. `RefreshTypesByMonthReport` consumes
+the shared `List<AppointmentDisplay>`, uses its own `GroupBy(appointment => ...)` lambda to group
+all appointments by local start year, numeric month, and type, counts each group, sorts by
+year/month/type, and materializes a `List<AppointmentTypeCountRow>`. `TimeHelper.ToLocal` derives
+grouping keys without changing the appointment objects' UTC timestamps. No report-specific query
+or additional library is used.
+
+`RefreshReports` runs on successful and failed `LoadAppointments` paths, including post-Add/Edit/Delete
+reloads. Successful empty loads show no appointments; failures clear the report and show unavailable
+while preserving the existing successful-write/failed-refresh messages. Subsequent successful loads
+restore the report.
+
+The agent executed the implementation build (0 errors, 14 existing warnings) and whitespace checks.
+The user confirmed the layout and, on 2026-09-24, all requested runtime checks: repeated-type counts,
+separate types and years, Add/Edit/Delete refresh including type/month changes, UTC/local month-boundary
+grouping, successful empty loads, failed reload clearing/unavailable state, and successful recovery.
+Runtime verification is user-reported, not independently agent-executed.
+
+User Schedules and Appointment Count by Customer remain pending; their sub-tabs currently provide
+the layout only. The requirements for all three reports to use collections and their own lambdas
+remain unchecked until the remaining reports are implemented and verified.
 
 ## A8 — Activity Log
 
