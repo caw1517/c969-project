@@ -4,6 +4,13 @@ using System.Text;
 
 namespace C969_Project.Database
 {
+    public class CustomerAppointmentCountRow
+    {
+        public int CustomerId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public int Count { get; set; }
+    }
+
     public class AppointmentTypeCountRow
     {
         public int Year { get; set; }

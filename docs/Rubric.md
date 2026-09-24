@@ -171,10 +171,10 @@ Must use **collection classes**, and **each of the three reports needs its own l
 The rubric explicitly fails this if "less than 3 of the reports incorporate a lambda expression."
 
 - [x] Number of appointment types by month
-- [ ] Schedule for each **user**
-- [ ] One additional report of your choice — Appointment Count by Customer
-- [ ] All three use collection classes
-- [ ] All three each contain a lambda expression
+- [x] Schedule for each **user**
+- [x] One additional report of your choice — Appointment Count by Customer
+- [x] All three use collection classes
+- [x] All three each contain a lambda expression
 
 **Evidence (2026-09-24):** Types by Month is implemented for
 [#38](https://github.com/caw1517/c969-project/issues/38). `MainForm.ConfigureReportsLayout`
@@ -197,9 +197,55 @@ separate types and years, Add/Edit/Delete refresh including type/month changes, 
 grouping, successful empty loads, failed reload clearing/unavailable state, and successful recovery.
 Runtime verification is user-reported, not independently agent-executed.
 
-User Schedules and Appointment Count by Customer remain pending; their sub-tabs currently provide
-the layout only. The requirements for all three reports to use collections and their own lambdas
-remain unchecked until the remaining reports are implemented and verified.
+**User Schedules evidence (2026-09-24):** Implemented for
+[#39](https://github.com/caw1517/c969-project/issues/39). `MainForm.ConfigureUserSchedulesLayout`
+creates one explicit read-only grid for all users with User, Customer, Type, Title, Start, and End.
+Automatic columns and user row creation/deletion are disabled; IDs remain hidden.
+`RefreshUserSchedulesReport` consumes the shared appointment collection and uses its own
+`OrderBy(appointment => appointment.UserName)` lambda, followed by UserId, UTC Start, and
+AppointmentId tie-breakers. `ToList()` materializes a separately ordered
+`List<AppointmentDisplay>` without modifying the shared list or appointment timestamps.
+`userSchedulesDataTable_CellFormatting` uses `TimeHelper.ToLocal` only for displayed Start/End
+values; bound timestamps retain `Kind.Utc`. A label displays `TimeZoneInfo.Local.DisplayName`.
+The report joins `RefreshReports`, including successful CRUD reloads, successful empty results,
+failed reload clearing/unavailable state, and recovery after a successful load. Existing
+successful-write/failed-refresh messages are preserved. No report-specific query or library was added.
+
+Agent-executed verification: the implementation build passed with 0 errors and 14 existing warnings,
+using `C969-Project/bin/walkthrough-check` as the output directory to avoid the running app's file
+lock. `git diff --check` passed. These are build/static checks, not agent-executed runtime tests.
+The user confirmed the layout and explicitly reported all requested runtime checks passed:
+multiple users and displayed fields; ordering, including duplicate names and tied starts where
+fixtures permit; local timestamps compared with stored UTC, including DST-sensitive dates and
+bound `Kind.Utc`; Add/Edit/Delete refresh; successful empty results; failed reload clearing; and
+successful recovery. Fixture details were not separately supplied. Runtime verification is
+user-reported, not independently agent-executed.
+
+**Appointment Count by Customer evidence (2026-09-24):** Implemented for
+[#40](https://github.com/caw1517/c969-project/issues/40).
+`MainForm.ConfigureAppointmentsByCustomerLayout` creates an explicit read-only Customer/Count
+grid with automatic columns and user row creation/deletion disabled. `CustomerId` is retained
+internally in `CustomerAppointmentCountRow` but is not displayed.
+`RefreshAppointmentsByCustomerReport` consumes the shared appointment list and uses its own
+`GroupBy(appointment => appointment.CustomerId)` lambda. It carries the customer name from
+each group, counts all appointments, orders by CustomerName then CustomerId, and materializes
+a `List<CustomerAppointmentCountRow>`. Different customers with the same name remain separate;
+customers without appointments contribute no rows. No report-specific query or library was added.
+The report joins the shared `RefreshReports` path for successful loads and CRUD reloads,
+successful empty results, failed reload clearing/unavailable state, and successful recovery.
+Existing successful-write/failed-refresh messages are preserved.
+
+Agent-executed verification: the implementation build passed with 0 errors and 14 existing
+warnings, using `C969-Project/bin/walkthrough-check` as the output directory; whitespace checks
+passed. These are build/static checks, not agent-executed runtime tests. The user confirmed the
+layout and all requested runtime checks: two appointments produce Count = 2; duplicate customer
+names remain separate; customers without appointments are omitted; Add/Edit/Delete update counts,
+including moving an appointment between customers; successful empty results; failed reload
+clearing; and successful recovery. Runtime verification is user-reported, not independently
+agent-executed.
+
+All three reports are implemented and verified with the evidence above. Each materializes its
+own generic collection and contains its own collection-processing lambda, completing A7.
 
 ## A8 — Activity Log
 
